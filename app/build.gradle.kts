@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -51,4 +52,20 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    // Navegación entre pantallas
+    implementation(libs.androidx.navigation.compose)
+
+    // ViewModel (MVVM)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Room (persistencia local)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // Íconos para los mensajes de error en formularios
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    // Mostrar la foto tomada con la cámara
+    implementation(libs.coil.compose)
 }
