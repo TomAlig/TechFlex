@@ -11,24 +11,30 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.duoc.agroapp.data.local.DatabaseFlex
+import com.duoc.agroapp.repository.LoginRepository
 import com.duoc.agroapp.ui.theme.AgroAppTheme
+import com.duoc.agroapp.viewmodel.LoginViewModel
+import com.duoc.agroapp.ui.screens.LoginScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        //Se inicializan los valores de los distintos modulos.
+        val database = DatabaseFlex.getDatabase(applicationContext)
+        val dao = database.userDao()
+        val repository = LoginRepository(dao)
+        val viewModel = LoginViewModel(repository)
         setContent {
             AgroAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                //Muestra la pantalla.
+                    LoginScreen(viewModel = viewModel)
                 }
             }
         }
     }
-}
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
