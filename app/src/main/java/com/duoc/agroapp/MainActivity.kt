@@ -4,19 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.duoc.agroapp.data.local.DatabaseFlex
 import com.duoc.agroapp.repository.LoginRepository
-import com.duoc.agroapp.ui.theme.AgroAppTheme
-import com.duoc.agroapp.viewmodel.LoginViewModel
+import com.duoc.agroapp.repository.SolicitudRepository
+import com.duoc.agroapp.ui.screens.CrearSolicitudScreen
 import com.duoc.agroapp.ui.screens.LoginScreen
+import com.duoc.agroapp.ui.screens.MisSolicitudesScreen
+import com.duoc.agroapp.ui.theme.AgroAppTheme
+import com.duoc.agroapp.viewmodel.CrearSolicitudViewModel
+import com.duoc.agroapp.viewmodel.LoginViewModel
+import com.duoc.agroapp.viewmodel.MisSolicitudesViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,27 +27,33 @@ class MainActivity : ComponentActivity() {
         val dao = database.userDao()
         val repository = LoginRepository(dao)
         val viewModel = LoginViewModel(repository)
+
+        val solicitudRepository = SolicitudRepository(database.solicitudDao())
+        //Correo temporal: cuando el login pase el usuario, se reemplaza por el real.
+        val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
+        val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
+
         setContent {
             AgroAppTheme {
-                //Muestra la pantalla.
-                    LoginScreen(viewModel = viewModel)
+                val navController = rememberNavController()
+                //Para probar otra pantalla, cambia startDestination: "login", "mis_solicitudes" o "crear_solicitud".
+                NavHost(navController = navController, startDestination = "login") {
+                    composable("login") { LoginScreen(viewModel = viewModel) }
+                    composable("mis_solicitudes") {
+                        MisSolicitudesScreen(
+                            viewModel = misSolicitudesViewModel,
+                            onNuevaSolicitud = { navController.navigate("crear_solicitud") }
+                        )
+                    }
+                    composable("crear_solicitud") {
+                        CrearSolicitudScreen(
+                            viewModel = crearSolicitudViewModel,
+                            onSolicitudCreada = { navController.popBackStack() },
+                            onVolver = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
         }
-    }
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AgroAppTheme {
-        Greeting("Android")
     }
 }
