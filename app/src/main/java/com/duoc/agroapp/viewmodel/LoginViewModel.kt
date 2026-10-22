@@ -1,0 +1,76 @@
+package com.duoc.agroapp.viewmodel
+
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import com.duoc.agroapp.model.LoginEstadoUI
+import com.duoc.agroapp.repository.LoginRepository
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import com.duoc.agroapp.model.LoginResultado
+import kotlinx.coroutines.launch
+
+//Se recolecta la logica de negocio del repository y se crean funciones para la ui, validaciones y verificaciones en los inputs.
+class LoginViewModel(private val repository: LoginRepository): ViewModel() {
+    var estadoUI by mutableStateOf(LoginEstadoUI())
+        private set
+    init {
+        viewModelScope.launch {
+            repository.ultimoUsuario.collect { usuario ->
+                if (usuario != null) {
+                    estadoUI = estadoUI.copy(
+                        email = usuario.email,
+                        password = usuario.contrasena
+                    )
+                }
+            }
+        }
+    }
+
+    //Actualiza input email.
+    fun onEmailChange(nuevoEmail: String) {
+        estadoUI = estadoUI.copy(email = nuevoEmail)
+    }
+
+    //Actualiza input contraseña.
+    fun onPasswordChange(nuevaPass: String) {
+        estadoUI = estadoUI.copy(password = nuevaPass)
+    }
+
+    //Verifica que los campos no esten vacios y que el campo de email tenga un "@".
+    fun iniciarSesion() {
+        if (estadoUI.email.isBlank() || estadoUI.password.isBlank()) {
+            estadoUI = estadoUI.copy(
+                loginResultado = LoginResultado(
+                    exito = false,
+                    errorMsg = "Completa todos los campos"
+                )
+            )
+            return
+        }
+
+        //Verificacion de correo inicial.
+        if (!estadoUI.email.contains("@")) {
+            estadoUI = estadoUI.copy(
+                loginResultado = LoginResultado(
+                    exito = false,
+                    errorMsg = "El correo electrónico debe contener un '@'"
+                )
+            )
+            return
+        }
+
+        //Si atraviesa los ifs que retornan:
+        viewModelScope.launch {
+            estadoUI = estadoUI.copy(cargando = true)
+
+            // Guardamos en Room usando repository
+            repository.simularLoginExitoso(estadoUI.email, estadoUI.password)
+
+            estadoUI = estadoUI.copy(
+                cargando = false,
+                loginResultado = LoginResultado(exito = true)
+            )
+        }
+    }
+}
