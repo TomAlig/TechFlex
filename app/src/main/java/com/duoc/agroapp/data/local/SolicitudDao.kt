@@ -16,6 +16,10 @@ interface SolicitudDao {
     @Query("SELECT * FROM solicitudes_tabla WHERE emailUsuario = :email ORDER BY id DESC")
     fun obtenerSolicitudesDeUsuario(email: String): Flow<List<SolicitudEntity>>
 
+    //Todas las solicitudes que todavía aceptan ofertas, de cualquier productor.
+    //La usa la vista "Solicitudes cerca" del prestador.
+    @Query("SELECT * FROM solicitudes_tabla WHERE estado != 'Finalizada' ORDER BY id DESC")
+    fun obtenerSolicitudesAbiertas(): Flow<List<SolicitudEntity>>
     @Delete
     suspend fun eliminarSolicitud(solicitud: SolicitudEntity)
 }
