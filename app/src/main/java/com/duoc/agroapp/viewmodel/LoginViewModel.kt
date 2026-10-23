@@ -38,6 +38,7 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
     }
 
     //Verifica que los campos no esten vacios y que el campo de email tenga un "@".
+    //guardarDatos se utiliza para darle valor real al checkbox de recuerdame
     fun iniciarSesion() {
         if (estadoUI.email.isBlank() || estadoUI.password.isBlank()) {
             estadoUI = estadoUI.copy(
