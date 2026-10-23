@@ -17,6 +17,8 @@ import com.duoc.agroapp.ui.theme.AgroAppTheme
 import com.duoc.agroapp.viewmodel.CrearSolicitudViewModel
 import com.duoc.agroapp.viewmodel.LoginViewModel
 import com.duoc.agroapp.viewmodel.MisSolicitudesViewModel
+import com.duoc.agroapp.viewmodel.SolicitudesCercaViewModel
+import com.duoc.agroapp.ui.screens.SolicitudesCercaScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,11 +34,12 @@ class MainActivity : ComponentActivity() {
         //Correo temporal: cuando el login pase el usuario, se reemplaza por el real.
         val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
         val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
+        val solicitudesCercaViewModel = SolicitudesCercaViewModel(solicitudRepository)
 
         setContent {
             AgroAppTheme {
                 val navController = rememberNavController()
-                //Para probar otra pantalla, cambia startDestination: "login", "mis_solicitudes" o "crear_solicitud".
+                //Para probar otra pantalla, cambia startDestination: "login", "mis_solicitudes" o "crear_solicitud" o "solicitudes_cerca".
                 NavHost(navController = navController, startDestination = "login") {
                     composable("login") { LoginScreen(viewModel = viewModel) }
                     composable("mis_solicitudes") {
@@ -50,6 +53,13 @@ class MainActivity : ComponentActivity() {
                             viewModel = crearSolicitudViewModel,
                             onSolicitudCreada = { navController.popBackStack() },
                             onVolver = { navController.popBackStack() }
+                        )
+                    }
+                    composable("solicitudes_cerca") {
+                        SolicitudesCercaScreen(
+                            viewModel = solicitudesCercaViewModel,
+                            //El detalle es el próximo feature; por ahora tocar la tarjeta no hace nada.
+                            onVerDetalle = { }
                         )
                     }
                 }
