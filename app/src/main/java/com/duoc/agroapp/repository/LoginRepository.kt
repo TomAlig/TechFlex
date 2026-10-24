@@ -7,15 +7,19 @@ import kotlinx.coroutines.flow.Flow
 //Union de viewmodel y Dao
 //El repository toma el dao como argumento para operar.
 class LoginRepository(private val userDao: UserDao) {
-    val ultimoUsuario: Flow<UserEntity ?> = userDao.obtenerUltimoUsuario()
 
+    suspend fun obtenerUltimoUsuario(): UserEntity? {
+        return userDao.obtenerUltimoUsuario()
+    }
     //Simula el login.
-    suspend fun simularLoginExitoso(email: String, contrasena: String) {
+    suspend fun simularLoginExitoso(email: String, contrasena: String, mantener: Boolean) {
         //Se limpia sesion vieja
         userDao.desmarcarUltimosUsuarios()
 
-        //Se crea una nueva entidad y el dao la guarda en el disco duro.
+        if (mantener) {
+            // Se guarda al usuario como recordado.
         val usuario = UserEntity(email = email, contrasena = contrasena, esUltimoLogeado = true)
         userDao.guardarUsuario(usuario)
+        }
     }
 }

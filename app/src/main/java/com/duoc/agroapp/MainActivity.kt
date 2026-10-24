@@ -41,13 +41,25 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 //Para probar otra pantalla, cambia startDestination: "login", "mis_solicitudes" o "crear_solicitud" o "solicitudes_cerca".
                 NavHost(navController = navController, startDestination = "login") {
-                    composable("login") { LoginScreen(viewModel = viewModel) }
+                    composable("login") {
+                        LoginScreen(
+                            viewModel = viewModel,
+                            onLoginSuccess = {
+                                navController.navigate("mis_solicitudes") {
+                                    //saca login para que no aparezca al apretar hacia atras en el telefono.
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
                     composable("mis_solicitudes") {
                         MisSolicitudesScreen(
                             viewModel = misSolicitudesViewModel,
                             onNuevaSolicitud = { navController.navigate("crear_solicitud") }
                         )
                     }
+
                     composable("crear_solicitud") {
                         CrearSolicitudScreen(
                             viewModel = crearSolicitudViewModel,
@@ -55,6 +67,7 @@ class MainActivity : ComponentActivity() {
                             onVolver = { navController.popBackStack() }
                         )
                     }
+
                     composable("solicitudes_cerca") {
                         SolicitudesCercaScreen(
                             viewModel = solicitudesCercaViewModel,
