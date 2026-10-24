@@ -24,8 +24,7 @@ fun PerfilUsuarioScreen(onCerrarSesion: () -> Unit) {
 
         Button(
             onClick = onCerrarSesion,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-            launchSingleTop = true
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {
             Text("Cerrar Sesión")
         }
