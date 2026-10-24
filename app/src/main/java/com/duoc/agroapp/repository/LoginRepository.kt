@@ -11,6 +11,12 @@ class LoginRepository(private val userDao: UserDao) {
     suspend fun obtenerUltimoUsuario(): UserEntity? {
         return userDao.obtenerUltimoUsuario()
     }
+
+    //Cerrar sesion (en gestor de perfil)
+    suspend fun cerrarSesion() {
+        userDao.borrarUsuario()
+    }
+
     //Simula el login.
     suspend fun simularLoginExitoso(email: String, contrasena: String, mantener: Boolean) {
         //Se limpia sesion vieja

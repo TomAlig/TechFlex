@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,6 +20,8 @@ import com.duoc.agroapp.viewmodel.LoginViewModel
 import com.duoc.agroapp.viewmodel.MisSolicitudesViewModel
 import com.duoc.agroapp.viewmodel.SolicitudesCercaViewModel
 import com.duoc.agroapp.ui.screens.SolicitudesCercaScreen
+import com.duoc.agroapp.ui.screens.PerfilUsuarioScreen
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +35,10 @@ class MainActivity : ComponentActivity() {
 
         val solicitudRepository = SolicitudRepository(database.solicitudDao())
         //Correo temporal: cuando el login pase el usuario, se reemplaza por el real.
-        val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
-        val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
+        val crearSolicitudViewModel =
+            CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
+        val misSolicitudesViewModel =
+            MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
         val solicitudesCercaViewModel = SolicitudesCercaViewModel(solicitudRepository)
 
         setContent {
@@ -45,7 +50,7 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(
                             viewModel = viewModel,
                             onLoginSuccess = {
-                                navController.navigate("mis_solicitudes") {
+                                navController.navigate("perfil") {
                                     //saca login para que no aparezca al apretar hacia atras en el telefono.
                                     popUpTo("login") { inclusive = true }
                                 }
@@ -73,6 +78,25 @@ class MainActivity : ComponentActivity() {
                             viewModel = solicitudesCercaViewModel,
                             //El detalle es el próximo feature; por ahora tocar la tarjeta no hace nada.
                             onVerDetalle = { }
+                        )
+                    }
+
+                    //Para que la implementacion de scope sirva correctamente, se cambiara cerrarSesion a suspend mas adelante.
+                    composable("perfil") {
+                        val scope = rememberCoroutineScope() // Habilita corrutinas para ejecutar en segundo plano desde Compose
+                        PerfilUsuarioScreen(
+                            onCerrarSesion = {
+                                scope.launch {
+                                    //Vacia room
+                                    viewModel.cerrarSesion()
+
+                                    //Con room vacio, regresa al login
+                                    navController.navigate("login") {
+                                        //Elimina el historial de la pagina, incluyendo la de perfil tras volver al login, para que no se pueda navegar hacia atras.
+                                        popUpTo("perfil") { inclusive = true }
+                                    }
+                                }
+                            }
                         )
                     }
                 }

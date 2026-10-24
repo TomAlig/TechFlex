@@ -29,6 +29,8 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
     //Variables usadas para el modal de recuperar contraseña.
     var ModalRecuperar by remember {mutableStateOf(false)}
 
+    // Reacciona automáticamente cuando loginResultado cambia a éxito.
+    // Esto maneja el pase automático del Room y el inicio de sesión manual.
     LaunchedEffect(estado.loginResultado) {
         if (estado.loginResultado?.exito == true) {
             onLoginSuccess()

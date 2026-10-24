@@ -10,25 +10,25 @@ import androidx.lifecycle.viewModelScope
 import com.duoc.agroapp.model.LoginResultado
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 //Se recolecta la logica de negocio del repository y se crean funciones para la ui, validaciones y verificaciones en los inputs.
 class LoginViewModel(private val repository: LoginRepository): ViewModel() {
     var estadoUI by mutableStateOf(LoginEstadoUI())
         private set
+
     init {
         viewModelScope.launch {
             val usuario = withContext(Dispatchers.IO) {
                 repository.obtenerUltimoUsuario()
             }
-                if (usuario != null) {
-                    estadoUI = estadoUI.copy(
-                        loginResultado = LoginResultado(exito = true)
-                    )
-                }
+            if (usuario != null) {
+                estadoUI = estadoUI.copy(
+                    loginResultado = LoginResultado(exito = true)
+                )
             }
         }
+    }
 
     fun cambiarMantener(valor: Boolean) {
         estadoUI = estadoUI.copy(mantener = valor)
@@ -79,6 +79,18 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
                 cargando = false,
                 loginResultado = LoginResultado(exito = true)
             )
+        }
+    }
+
+    //Funcion para volver al login desde perfil
+    //Contiene una corrutina para el borrado de Room
+    fun cerrarSesion() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.cerrarSesion() // Borra Room
+            withContext(Dispatchers.Main) {
+                // Reinicia el estado de la interfaz
+                estadoUI = LoginEstadoUI()
+            }
         }
     }
 }

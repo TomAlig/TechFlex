@@ -15,9 +15,13 @@ interface UserDao {
 
     //esUltimoLogeado es un boolean, si hay alguien recordado es un 1, si no, un 0 (true/false)
     @Query("SELECT * FROM usuarios_tabla WHERE esUltimoLogeado = 1 LIMIT 1")
-    fun obtenerUltimoUsuario(): UserEntity ? //Flow vigila el cambio y cambia las reglas segun corresponda inmendiatamente.
+    fun obtenerUltimoUsuario(): UserEntity ?
 
     //Si esUltimoLogeado no está activado, es decir, no hay nadie, se borra el llenado de campos.
     @Query("UPDATE usuarios_tabla SET esUltimoLogeado = 0")
     suspend fun desmarcarUltimosUsuarios()
+
+    // Consulta para vaciar la tabla de usuarios al cerrar sesion.
+    @Query("DELETE FROM usuarios_tabla")
+    suspend fun borrarUsuario()
 }
