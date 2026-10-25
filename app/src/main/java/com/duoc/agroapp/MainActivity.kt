@@ -93,7 +93,11 @@ class MainActivity : ComponentActivity() {
                                     //Con room vacio, regresa al login
                                     navController.navigate("login") {
                                         //Elimina el historial de la pagina, incluyendo la de perfil tras volver al login, para que no se pueda navegar hacia atras.
-                                        popUpTo("perfil") { inclusive = true }
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            inclusive = true
+                                        }
+
+                                        launchSingleTop = true
                                     }
                                 }
                             }

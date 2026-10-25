@@ -84,13 +84,14 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
 
     //Funcion para volver al login desde perfil
     //Contiene una corrutina para el borrado de Room
-    fun cerrarSesion() {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun cerrarSesion() {
+        //Dispatchers.IO pone a los trabajos en segundo plano a ejecutar.
+        withContext(Dispatchers.IO) {
             repository.cerrarSesion() // Borra Room
-            withContext(Dispatchers.Main) {
-                // Reinicia el estado de la interfaz
-                estadoUI = LoginEstadoUI()
-            }
+        }
+
+        // Reinicia el estado de la interfaz
+        estadoUI = LoginEstadoUI()
+
         }
     }
-}
