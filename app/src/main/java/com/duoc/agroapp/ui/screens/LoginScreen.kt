@@ -20,16 +20,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.*
 val AzulTechFlex = Color(0xFF3668FF)
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
     // con el valor de estado se va actualizando por cada input.
     val estado = viewModel.estadoUI
 
-    //Checkbox button para recordar al usuario. (Falta darle funcion.)
-    var recuerdame by remember { mutableStateOf(false) }
     var correoRecuperacion by remember { mutableStateOf("") }
 
     //Variables usadas para el modal de recuperar contraseña.
     var ModalRecuperar by remember {mutableStateOf(false)}
+
+    LaunchedEffect(estado.loginResultado) {
+        if (estado.loginResultado?.exito == true) {
+            onLoginSuccess()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -39,6 +43,8 @@ fun LoginScreen(viewModel: LoginViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.weight(1f))
+
         Image(
             painter = painterResource(id = R.drawable.logo_tecmundo_connect), //Foto de drawable del logo (png)
             contentDescription = "Logo Tecmundo",
@@ -82,14 +88,14 @@ fun LoginScreen(viewModel: LoginViewModel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { recuerdame = !recuerdame }, // Hace que al tocar el texto también se active
+                .clickable {  viewModel.cambiarMantener(!estado.mantener) }, // Hace que al tocar el texto también se active
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Checkbox para recordar usuario
             Checkbox(
-                checked = true,
-                enabled = false,
-                onCheckedChange = { recuerdame = it },
+                checked = estado.mantener,
+                enabled = true,
+                onCheckedChange = { viewModel.cambiarMantener(it) },
                 colors = CheckboxDefaults.colors(
                     checkedColor = AzulTechFlex // Se pinta del azul al estar checkeado.
                 )
@@ -98,7 +104,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "Recuérdame (Siempre activo en esta version.)",
+                text = "Recuérdame",
                 fontSize = 14.sp,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -149,6 +155,15 @@ fun LoginScreen(viewModel: LoginViewModel) {
             modifier = Modifier
                 .clickable { /* Logica de nav al registro aqui. */ }
                 .padding(8.dp)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Text(
+            text = "© 2026 TecMundo. \nTodos los derechos reservados.",
+            color = Color.DarkGray,
+            modifier = Modifier
+                .padding(20.dp)
         )
 
         //Logica del modal

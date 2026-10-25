@@ -12,5 +12,11 @@ data class LoginEstadoUI(
     val email: String = "",
     val password: String = "",
     val cargando: Boolean = false,
-    val loginResultado: LoginResultado ? = null
+    val loginResultado: LoginResultado ? = null,
+
+    //Propiedad agregada para manejar el salto del login al dashboard si "Recordarme" esta marcado.
+    val mantener: Boolean = false,
+
+    //Propiedad para controlar el paso a dashboard
+    val irAlDashboard: Boolean = false
 )
