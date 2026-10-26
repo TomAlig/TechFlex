@@ -18,7 +18,7 @@ import com.duoc.agroapp.R
 import androidx.compose.runtime.*
 val AzulTechFlex = Color(0xFF3668FF)
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
+fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit, onNavigateToRegister: () -> Unit  ) {
     // con el valor de estado se va actualizando por cada input.
     val estado = viewModel.estadoUI
 
@@ -116,7 +116,7 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
         } else {
             // Si no está cargando, muestra el botón normal
             Button(
-                onClick = { viewModel.iniciarSesion() },
+                onClick = { viewModel.iniciarSesionVal() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AzulTechFlex
@@ -153,7 +153,7 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
         Text(
             text = "¿No tienes cuenta? Regístrate",
             modifier = Modifier
-                .clickable { /* Logica de nav al registro aqui. */ }
+                .clickable { onNavigateToRegister() }
                 .padding(8.dp)
         )
 
@@ -216,7 +216,6 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
             )
         }
     }
-
 }
 
 

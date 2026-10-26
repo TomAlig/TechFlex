@@ -20,6 +20,7 @@ import com.duoc.agroapp.viewmodel.MisSolicitudesViewModel
 import com.duoc.agroapp.viewmodel.SolicitudesCercaViewModel
 import com.duoc.agroapp.ui.screens.SolicitudesCercaScreen
 import com.duoc.agroapp.repository.RegistroRepository
+import com.duoc.agroapp.ui.screens.PerfilUsuarioScreen
 import com.duoc.agroapp.ui.screens.RegistroScreen
 import com.duoc.agroapp.viewmodel.RegistroViewModel
 
@@ -35,8 +36,10 @@ class MainActivity : ComponentActivity() {
 
         val solicitudRepository = SolicitudRepository(database.solicitudDao())
         //Correo temporal: cuando el login pase el usuario, se reemplaza por el real.
-        val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
-        val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
+        val crearSolicitudViewModel =
+            CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
+        val misSolicitudesViewModel =
+            MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
         val solicitudesCercaViewModel = SolicitudesCercaViewModel(solicitudRepository)
         val registroRepository = RegistroRepository(dao)
         val registroViewModel = RegistroViewModel(registroRepository)
@@ -50,10 +53,13 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(
                             viewModel = viewModel,
                             onLoginSuccess = {
-                                navController.navigate("mis_solicitudes") {
+                                navController.navigate("perfil") {
                                     //saca login para que no aparezca al apretar hacia atras en el telefono.
                                     popUpTo("login") { inclusive = true }
                                 }
+                            },
+                            onNavigateToRegister = {
+                                navController.navigate("registro")
                             }
                         )
                     }
@@ -88,6 +94,19 @@ class MainActivity : ComponentActivity() {
                                 //para que el botón "atrás" no vuelva al formulario.
                                 navController.navigate("login") {
                                     popUpTo("registro") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    composable("perfil") {
+
+                        PerfilUsuarioScreen(
+                            onCerrarSesion = {
+                                //Vacia room
+                                viewModel.cerrarSesion()
+                                navController.navigate("login") {
+                                    popUpTo("perfil") { inclusive = true }
                                 }
                             }
                         )

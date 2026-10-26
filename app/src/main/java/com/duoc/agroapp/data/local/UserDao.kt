@@ -32,4 +32,8 @@ interface UserDao {
     //Busca un usuario por RUT, para no permitir dos cuentas con el mismo RUT.
     @Query("SELECT * FROM usuarios_tabla WHERE rut = :rut LIMIT 1")
     suspend fun buscarPorRut(rut: String): UserEntity?
+
+    //Marca a al usuario actual como la sesion recordada.
+    @Query("UPDATE usuarios_tabla SET esUltimoLogeado = 1 WHERE email = :email")
+    suspend fun marcarComoLogeado(email: String)
 }

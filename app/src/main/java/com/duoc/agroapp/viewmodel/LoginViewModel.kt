@@ -46,7 +46,7 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
 
     //Verifica que los campos no esten vacios y que el campo de email tenga un "@".
     //guardarDatos se utiliza para darle valor real al checkbox de recuerdame
-    fun iniciarSesion() {
+    fun iniciarSesionVal() {
         if (estadoUI.email.isBlank() || estadoUI.password.isBlank()) {
             estadoUI = estadoUI.copy(
                 loginResultado = LoginResultado(
@@ -72,26 +72,18 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
         viewModelScope.launch {
             estadoUI = estadoUI.copy(cargando = true)
 
-            // Guardamos en Room usando repository
-            repository.simularLoginExitoso(estadoUI.email, estadoUI.password, estadoUI.mantener)
+            //El repositorio ya devuelve si fue exitoso y, si no, el mensaje de error.
+            val resultado =
+                repository.iniciarSesion(estadoUI.email, estadoUI.password, estadoUI.mantener)
 
-            estadoUI = estadoUI.copy(
-                cargando = false,
-                loginResultado = LoginResultado(exito = true)
-            )
+            estadoUI = estadoUI.copy(cargando = false, loginResultado = resultado)
         }
     }
 
-    //Funcion para volver al login desde perfil
-    //Contiene una corrutina para el borrado de Room
-    suspend fun cerrarSesion() {
-        //Dispatchers.IO pone a los trabajos en segundo plano a ejecutar.
-        withContext(Dispatchers.IO) {
-            repository.cerrarSesion() // Borra Room
+    fun cerrarSesion() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.cerrarSesion() // El repository SÍ es suspend, por eso va dentro de launch
         }
-
-        // Reinicia el estado de la interfaz
         estadoUI = LoginEstadoUI()
-
-        }
     }
+}
