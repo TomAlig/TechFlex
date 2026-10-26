@@ -19,6 +19,9 @@ import com.duoc.agroapp.viewmodel.LoginViewModel
 import com.duoc.agroapp.viewmodel.MisSolicitudesViewModel
 import com.duoc.agroapp.viewmodel.SolicitudesCercaViewModel
 import com.duoc.agroapp.ui.screens.SolicitudesCercaScreen
+import com.duoc.agroapp.repository.RegistroRepository
+import com.duoc.agroapp.ui.screens.RegistroScreen
+import com.duoc.agroapp.viewmodel.RegistroViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +38,8 @@ class MainActivity : ComponentActivity() {
         val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
         val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
         val solicitudesCercaViewModel = SolicitudesCercaViewModel(solicitudRepository)
+        val registroRepository = RegistroRepository(dao)
+        val registroViewModel = RegistroViewModel(registroRepository)
 
         setContent {
             AgroAppTheme {
@@ -73,6 +78,18 @@ class MainActivity : ComponentActivity() {
                             viewModel = solicitudesCercaViewModel,
                             //El detalle es el próximo feature; por ahora tocar la tarjeta no hace nada.
                             onVerDetalle = { }
+                        )
+                    }
+                    composable("registro") {
+                        RegistroScreen(
+                            viewModel = registroViewModel,
+                            onRegistroExitoso = {
+                                //Después de registrarse va al login, y el registro sale del historial
+                                //para que el botón "atrás" no vuelva al formulario.
+                                navController.navigate("login") {
+                                    popUpTo("registro") { inclusive = true }
+                                }
+                            }
                         )
                     }
                 }
