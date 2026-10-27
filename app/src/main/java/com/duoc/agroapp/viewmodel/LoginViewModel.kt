@@ -80,10 +80,13 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
         }
     }
 
-    fun cerrarSesion() {
+    fun cerrarSesion(onResultado: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.cerrarSesion() // El repository SÍ es suspend, por eso va dentro de launch
+            repository.cerrarSesion() //El cierre de sesion es lo que se espera antes del cambio.
+            withContext(Dispatchers.Main) { //Carril actualizacion de ui para main
+                estadoUI = LoginEstadoUI()
+                onResultado()
+            }
         }
-        estadoUI = LoginEstadoUI()
     }
 }

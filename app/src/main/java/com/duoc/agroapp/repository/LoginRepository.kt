@@ -13,7 +13,7 @@ class LoginRepository(private val userDao: UserDao) {
         return userDao.obtenerUltimoUsuario()
     }
 
-    //Cerrar sesion (en gestor de perfil)
+    //Funcion de inicio de sesion (mas robusta, sin simulacion.)
     suspend fun iniciarSesion(email: String, contrasena: String, mantener: Boolean): LoginResultado {
         val usuario = userDao.buscarPorEmail(email)
             ?: return LoginResultado(
@@ -31,6 +31,7 @@ class LoginRepository(private val userDao: UserDao) {
         return LoginResultado(exito = true)
     }
 
+    //Cerrar sesion (en gestor de perfil)
     suspend fun cerrarSesion() {
         userDao.desmarcarUltimosUsuarios()
     }

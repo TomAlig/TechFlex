@@ -36,10 +36,8 @@ class MainActivity : ComponentActivity() {
 
         val solicitudRepository = SolicitudRepository(database.solicitudDao())
         //Correo temporal: cuando el login pase el usuario, se reemplaza por el real.
-        val crearSolicitudViewModel =
-            CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
-        val misSolicitudesViewModel =
-            MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
+        val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
+        val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
         val solicitudesCercaViewModel = SolicitudesCercaViewModel(solicitudRepository)
         val registroRepository = RegistroRepository(dao)
         val registroViewModel = RegistroViewModel(registroRepository)
@@ -52,13 +50,13 @@ class MainActivity : ComponentActivity() {
                     composable("login") {
                         LoginScreen(
                             viewModel = viewModel,
-                            onLoginSuccess = {
+                            onLoginSuccess = { //Vaw ingresando tras un login exitoso.
                                 navController.navigate("perfil") {
                                     //saca login para que no aparezca al apretar hacia atras en el telefono.
                                     popUpTo("login") { inclusive = true }
                                 }
                             },
-                            onNavigateToRegister = {
+                            onNavigateToRegister = { //nav a registro por el boton correspondiente.
                                 navController.navigate("registro")
                             }
                         )
@@ -100,13 +98,12 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("perfil") {
-
                         PerfilUsuarioScreen(
                             onCerrarSesion = {
-                                //Vacia room
-                                viewModel.cerrarSesion()
-                                navController.navigate("login") {
-                                    popUpTo("perfil") { inclusive = true }
+                                viewModel.cerrarSesion {
+                                    navController.navigate("login") {
+                                        popUpTo("perfil") { inclusive = true }
+                                    }
                                 }
                             }
                         )
