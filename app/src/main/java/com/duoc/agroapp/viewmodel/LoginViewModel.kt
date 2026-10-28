@@ -23,6 +23,10 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
                 repository.obtenerUltimoUsuario()
             }
             if (usuario != null) {
+
+                //El correo que guarda el perfil, se almacena aqui, para que el remember entienda a quien mostrar.
+                PerfilViewModel.emailUsuarioLogueado = usuario.email
+
                 estadoUI = estadoUI.copy(
                     loginResultado = LoginResultado(exito = true)
                 )
@@ -75,6 +79,10 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
             //El repositorio ya devuelve si fue exitoso y, si no, el mensaje de error.
             val resultado =
                 repository.iniciarSesion(estadoUI.email, estadoUI.password, estadoUI.mantener)
+
+            if (resultado.exito) {
+                PerfilViewModel.emailUsuarioLogueado = estadoUI.email
+            }
 
             estadoUI = estadoUI.copy(cargando = false, loginResultado = resultado)
         }

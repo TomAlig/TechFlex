@@ -22,7 +22,9 @@ import com.duoc.agroapp.ui.screens.SolicitudesCercaScreen
 import com.duoc.agroapp.repository.RegistroRepository
 import com.duoc.agroapp.ui.screens.PerfilUsuarioScreen
 import com.duoc.agroapp.ui.screens.RegistroScreen
+import com.duoc.agroapp.viewmodel.PerfilViewModel
 import com.duoc.agroapp.viewmodel.RegistroViewModel
+import com.duoc.agroapp.repository.PerfilRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +43,9 @@ class MainActivity : ComponentActivity() {
         val solicitudesCercaViewModel = SolicitudesCercaViewModel(solicitudRepository)
         val registroRepository = RegistroRepository(dao)
         val registroViewModel = RegistroViewModel(registroRepository)
+        val miPerfilRepository = PerfilRepository(dao)
+        val perfilViewModel = PerfilViewModel(miPerfilRepository)
+
 
         setContent {
             AgroAppTheme {
@@ -99,6 +104,7 @@ class MainActivity : ComponentActivity() {
 
                     composable("perfil") {
                         PerfilUsuarioScreen(
+                            viewmodel = perfilViewModel,
                             onCerrarSesion = {
                                 viewModel.cerrarSesion {
                                     navController.navigate("login") {
