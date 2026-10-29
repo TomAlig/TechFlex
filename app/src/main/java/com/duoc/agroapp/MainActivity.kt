@@ -37,9 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.duoc.agroapp.repository.AdminRepository
 import com.duoc.agroapp.repository.NavegacionRepository
 import com.duoc.agroapp.repository.OfertaRepository
+import com.duoc.agroapp.ui.screens.AdminScreen
 import com.duoc.agroapp.ui.screens.DetalleOfertaScreen
+import com.duoc.agroapp.viewmodel.AdminViewModel
 import com.duoc.agroapp.viewmodel.DetalleOfertaViewModel
 import com.duoc.agroapp.viewmodel.NavViewModel
 import kotlinx.coroutines.launch
@@ -66,7 +69,12 @@ class MainActivity : ComponentActivity() {
         val navegacionRepository = NavegacionRepository(dao)
         val ofertaRepository = OfertaRepository(database.ofertaDao(), database.solicitudDao())
         val detalleOfertaViewModel = DetalleOfertaViewModel(ofertaRepository)
-
+        //Administrador: crea la cuenta admin la primera vez que se abre la app.
+        val adminRepository = AdminRepository(dao)
+        val adminViewModel = AdminViewModel(adminRepository)
+        lifecycleScope.launch {
+            adminRepository.crearAdminSiNoExiste()
+        }
 
         setContent {
             AgroAppTheme {
@@ -139,6 +147,7 @@ class MainActivity : ComponentActivity() {
                                             val destinoInicial = when (tipoUsuario) {
                                                 "Productor" -> "mis_solicitudes"
                                                 "Prestador" -> "solicitudes_cerca"
+                                                "Administrador" -> "admin"
                                                 else -> "perfil"
                                             }
                                             navController.navigate(destinoInicial) {
@@ -185,6 +194,9 @@ class MainActivity : ComponentActivity() {
                             solicitudId = id,
                             onVolver = { navController.popBackStack() }
                         )
+                    }
+                    composable("admin") {
+                        AdminScreen(viewModel = adminViewModel)
                     }
                     composable("registro") {
                         RegistroScreen(
