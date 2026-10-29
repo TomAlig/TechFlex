@@ -6,7 +6,7 @@ import android.content.Context
 import androidx.room.Room
 
 // Agrega SolicitudEntity::class al arreglo entities
-@Database(entities = [UserEntity::class, SolicitudEntity::class], version = 4, exportSchema = false)
+@Database(entities = [UserEntity::class, SolicitudEntity::class, OfertaEntity::class], version = 4, exportSchema = false)
 abstract class DatabaseFlex : RoomDatabase() {
     // Se obtiene el dao con la funcion abstracta despues de la anotacion @Database
     abstract fun userDao(): UserDao
