@@ -23,8 +23,9 @@ interface SolicitudDao {
 
     //Una sola solicitud por su id, para la vista de Detalle.
     //Es Flow: si cambia su estado, la pantalla se actualiza sola.
+    //Una sola solicitud por su id, para la vista de Detalle.
     @Query("SELECT * FROM solicitudes_tabla WHERE id = :id")
-    fun obtenerSolicitudPorId(id: Int): Flow<SolicitudEntity?>
+    suspend fun obtenerSolicitudPorId(id: Int): SolicitudEntity?
 
     //Cambia el estado de una solicitud (ej: de "Pendiente" a "Con ofertas").
     @Query("UPDATE solicitudes_tabla SET estado = :estado WHERE id = :id")

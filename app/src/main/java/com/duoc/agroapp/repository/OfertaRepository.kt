@@ -5,7 +5,6 @@ import com.duoc.agroapp.data.local.OfertaEntity
 import com.duoc.agroapp.data.local.SolicitudDao
 import com.duoc.agroapp.data.local.SolicitudEntity
 import com.duoc.agroapp.model.ESTADO_CON_OFERTAS
-import kotlinx.coroutines.flow.Flow
 
 //Une el ViewModel del Detalle con las tablas de ofertas y solicitudes.
 class OfertaRepository(
@@ -14,10 +13,9 @@ class OfertaRepository(
 ) {
 
     //La solicitud que se muestra en el Detalle.
-    fun obtenerSolicitud(id: Int): Flow<SolicitudEntity?> {
+    suspend fun obtenerSolicitud(id: Int): SolicitudEntity? {
         return solicitudDao.obtenerSolicitudPorId(id)
     }
-
     //true si este prestador ya ofertó en esta solicitud.
     suspend fun yaOferto(solicitudId: Int, emailPrestador: String): Boolean {
         return ofertaDao.buscarOfertaDelPrestador(solicitudId, emailPrestador) != null
