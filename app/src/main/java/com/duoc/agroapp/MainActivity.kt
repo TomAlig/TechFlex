@@ -38,6 +38,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.duoc.agroapp.repository.NavegacionRepository
+import com.duoc.agroapp.repository.OfertaRepository
+import com.duoc.agroapp.ui.screens.DetalleOfertaScreen
+import com.duoc.agroapp.viewmodel.DetalleOfertaViewModel
 import com.duoc.agroapp.viewmodel.NavViewModel
 import kotlinx.coroutines.launch
 
@@ -61,6 +64,8 @@ class MainActivity : ComponentActivity() {
         val miPerfilRepository = PerfilRepository(dao)
         val perfilViewModel = PerfilViewModel(miPerfilRepository)
         val navegacionRepository = NavegacionRepository(dao)
+        val ofertaRepository = OfertaRepository(database.ofertaDao(), database.solicitudDao())
+        val detalleOfertaViewModel = DetalleOfertaViewModel(ofertaRepository)
 
 
         setContent {
@@ -168,8 +173,17 @@ class MainActivity : ComponentActivity() {
                     composable("solicitudes_cerca") {
                         SolicitudesCercaScreen(
                             viewModel = solicitudesCercaViewModel,
-                            //El detalle es el próximo feature; por ahora tocar la tarjeta no hace nada.
-                            onVerDetalle = { }
+                            onVerDetalle = { id -> navController.navigate("detalle/$id") }
+                        )
+                    }
+
+                    composable("detalle/{id}") { entrada ->
+                        //La ruta siempre llega como texto, así que se convierte a número.
+                        val id = entrada.arguments?.getString("id")?.toIntOrNull() ?: 0
+                        DetalleOfertaScreen(
+                            viewModel = detalleOfertaViewModel,
+                            solicitudId = id,
+                            onVolver = { navController.popBackStack() }
                         )
                     }
                     composable("registro") {
