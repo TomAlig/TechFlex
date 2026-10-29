@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,15 +38,17 @@ fun SolicitudesCercaScreen(
             .statusBarsPadding()
             .padding(16.dp)
     ) {
-        //Encabezado del mockup: logo + "CONNECT" a la izquierda, avatar a la derecha
+        //Encabezado: logo de Tecmundo Connect a la izquierda, avatar a la derecha
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(id = R.drawable.logo_tecmundo),
-                contentDescription = "Logo Tecmundo",
-                modifier = Modifier.size(36.dp)
+                painter = painterResource(id = R.drawable.logo_tecmundo_connect),
+                contentDescription = "Logo Tecmundo Connect",
+                //Se fija solo la altura; el ancho se ajusta solo para no deformar la imagen.
+                modifier = Modifier.height(60.dp),
+                contentScale = ContentScale.Fit
             )
-            Spacer(Modifier.width(8.dp))
-            Text("CONNECT", fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
+            //Empuja el avatar hacia la derecha.
+            Spacer(Modifier.weight(1f))
             Icon(
                 imageVector = Icons.Filled.AccountCircle,
                 contentDescription = "Mi perfil",
