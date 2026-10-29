@@ -110,7 +110,7 @@ private fun Etiqueta(texto: String, fondo: Color, colorTexto: Color = Color(0xFF
 //Círculo naranjo con el ícono de cada obstáculo, como en el mockup.
 //Los textos son los mismos de OBSTACULOS_DISPONIBLES (Crear solicitud de Luis).
 @Composable
-private fun IconoObstaculo(obstaculo: String) {
+fun IconoObstaculo(obstaculo: String) {
     val icono = when (obstaculo) {
         "Antenas" -> Icons.Filled.CellTower
         "Cables" -> Icons.Filled.Cable
