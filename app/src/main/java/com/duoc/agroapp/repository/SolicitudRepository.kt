@@ -15,7 +15,14 @@ class SolicitudRepository(private val solicitudDao: SolicitudDao) {
         return solicitudDao.obtenerSolicitudesDeUsuario(emailUsuario)
     }
 
+    //Solicitudes abiertas de todos los productores, para la vista del prestador.
+    fun obtenerSolicitudesAbiertas(): Flow<List<SolicitudEntity>> {
+        return solicitudDao.obtenerSolicitudesAbiertas()
+    }
+
     suspend fun eliminarSolicitud(solicitud: SolicitudEntity) {
         solicitudDao.eliminarSolicitud(solicitud)
     }
+
+
 }

@@ -6,11 +6,13 @@ import android.content.Context
 import androidx.room.Room
 
 // Agrega SolicitudEntity::class al arreglo entities
-@Database(entities = [UserEntity::class, SolicitudEntity::class], version = 1, exportSchema = false)
+@Database(entities = [UserEntity::class, SolicitudEntity::class, OfertaEntity::class], version = 4, exportSchema = false)
 abstract class DatabaseFlex : RoomDatabase() {
     // Se obtiene el dao con la funcion abstracta despues de la anotacion @Database
     abstract fun userDao(): UserDao
     abstract fun solicitudDao(): SolicitudDao
+
+    abstract fun ofertaDao(): OfertaDao
 
     companion object {
         // Volatile permite que toda la app mantenga estos cambios en la sesion.
@@ -35,4 +37,4 @@ abstract class DatabaseFlex : RoomDatabase() {
             }
         }
     }
-} // <-- También asegúrate de incluir esta llave de cierre al final del archivo
+}
