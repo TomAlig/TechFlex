@@ -19,4 +19,12 @@ interface OfertaDao {
     //No la usa el Detalle: es para la vista "Ofertas" del productor.
     @Query("SELECT * FROM ofertas_tabla WHERE solicitudId = :solicitudId ORDER BY precioTotal ASC")
     fun obtenerOfertasDeSolicitud(solicitudId: Int): Flow<List<OfertaEntity>>
+
+    //Marca una oferta como aceptada.
+    @Query("UPDATE ofertas_tabla SET estado = 'Aceptada' WHERE id = :ofertaId")
+    suspend fun marcarAceptada(ofertaId: Int)
+
+    //Marca como rechazadas las demás ofertas de la misma solicitud.
+    @Query("UPDATE ofertas_tabla SET estado = 'Rechazada' WHERE solicitudId = :solicitudId AND id != :ofertaId")
+    suspend fun rechazarLasDemas(solicitudId: Int, ofertaId: Int)
 }

@@ -22,7 +22,12 @@ class NavegacionRepository (private val userDao: UserDao) {
                     titulo = "Mis Solicitudes",
                     ruta = "mis_solicitudes",
                     icono = Icons.Default.List
-                )
+                ),
+                NavegacionItem(
+                    titulo = "ofertas",
+                    ruta = "ofertas",
+                    icono = Icons.Default.List
+                ),
             )
 
             "Prestador" -> listOf(

@@ -25,34 +25,37 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.duoc.agroapp.model.OfertaEjemplo
+import com.duoc.agroapp.model.OFERTA_ACEPTADA
+import com.duoc.agroapp.model.OFERTA_PENDIENTE
+import com.duoc.agroapp.model.OFERTA_RECHAZADA
+import com.duoc.agroapp.model.OfertaConPrestador
 import com.duoc.agroapp.ui.screens.AzulTechFlex
+import java.text.NumberFormat
 import java.util.Locale
 
 private val VerdeAceptada = Color(0xFF1B6B3A)
 
-//Tarjeta de una oferta: datos del prestador, descripción desplegable y botones Aceptar / Contactar.
+//Tarjeta de una oferta: datos del prestador, detalle desplegable y botones Aceptar / Contactar.
 @Composable
 fun OfertaCard(
-    oferta: OfertaEjemplo,
+    oferta: OfertaConPrestador,
     esFavorita: Boolean,
-    aceptada: Boolean,
-    puedeAceptar: Boolean,
     onFavorito: () -> Unit,
     onAceptar: () -> Unit,
     onContactar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    //Estado solo visual: si la descripción está desplegada.
-    var descripcionVisible by remember { mutableStateOf(false) }
+    val datos = oferta.oferta
+    val aceptada = datos.estado == OFERTA_ACEPTADA
+
+    //Estado solo visual: si el detalle está desplegado.
+    var detalleVisible by remember { mutableStateOf(false) }
 
     //Al aceptarse la oferta, el fondo cambia a verde con una transición suave.
     val colorFondo by animateColorAsState(
         targetValue = if (aceptada) Color(0xFFD9F2E0) else MaterialTheme.colorScheme.surfaceVariant,
         label = "colorOferta"
     )
-    //La calificación se muestra con coma decimal, como en el diseño (3,4).
-    val calificacionTexto = "%.1f".format(Locale.forLanguageTag("es-CL"), oferta.calificacion)
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -68,19 +71,21 @@ fun OfertaCard(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
-                    Text("Precio por ha: ${oferta.precioPorHa}", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        "Precio por ha: $ ${formatoPesos(datos.precioPorHa)}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Row(
-                        modifier = Modifier.clickable { descripcionVisible = !descripcionVisible },
+                        modifier = Modifier.clickable { detalleVisible = !detalleVisible },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Descripción", style = MaterialTheme.typography.bodyMedium)
+                        Text("Detalle", style = MaterialTheme.typography.bodyMedium)
                         Icon(
-                            imageVector = if (descripcionVisible) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
-                            contentDescription = if (descripcionVisible) "Ocultar descripción" else "Ver descripción"
+                            imageVector = if (detalleVisible) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                            contentDescription = if (detalleVisible) "Ocultar detalle" else "Ver detalle"
                         )
                     }
                 }
-                Text(calificacionTexto, style = MaterialTheme.typography.titleSmall)
                 IconButton(onClick = onFavorito) {
                     Icon(
                         imageVector = if (esFavorita) Icons.Filled.Star else Icons.Filled.StarBorder,
@@ -89,15 +94,19 @@ fun OfertaCard(
                 }
             }
 
-            //Animación: la descripción se despliega y se oculta con una transición suave.
-            AnimatedVisibility(visible = descripcionVisible) {
-                Text(oferta.descripcion, style = MaterialTheme.typography.bodySmall)
+            //Animación: el detalle se despliega y se oculta con una transición suave.
+            AnimatedVisibility(visible = detalleVisible) {
+                Text(
+                    "Total estimado: $ ${formatoPesos(datos.precioTotal)} + IVA",
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = onAceptar,
-                    enabled = puedeAceptar,
+                    //Solo se puede aceptar una oferta que sigue pendiente.
+                    enabled = datos.estado == OFERTA_PENDIENTE,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AzulTechFlex,
@@ -105,7 +114,13 @@ fun OfertaCard(
                         disabledContentColor = Color.White
                     )
                 ) {
-                    Text(if (aceptada) "Aceptada" else "Aceptar")
+                    Text(
+                        when (datos.estado) {
+                            OFERTA_ACEPTADA -> "Aceptada"
+                            OFERTA_RECHAZADA -> "Rechazada"
+                            else -> "Aceptar"
+                        }
+                    )
                 }
                 Button(
                     onClick = onContactar,
@@ -132,4 +147,9 @@ private fun FotoPrestador() {
     ) {
         Icon(Icons.Filled.Person, contentDescription = "Foto del prestador", tint = AzulTechFlex)
     }
+}
+
+//Da formato de pesos chilenos con punto de miles (ej: 10000 -> 10.000).
+private fun formatoPesos(monto: Long): String {
+    return NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-CL")).format(monto)
 }

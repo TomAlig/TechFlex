@@ -2,6 +2,7 @@ package com.duoc.agroapp.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.filled.Agriculture
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,15 +23,18 @@ import com.duoc.agroapp.model.ESTADO_CON_OFERTAS
 import com.duoc.agroapp.model.ESTADO_FINALIZADA
 import com.duoc.agroapp.model.ESTADO_PENDIENTE
 import com.duoc.agroapp.ui.screens.AzulTechFlex
-import androidx.compose.runtime.getValue
 
 //Tarjeta de una solicitud: foto, datos principales, estado y botón de eliminar (solo si está pendiente).
+//Si la solicitud ya recibió ofertas, al tocar la tarjeta se navega a la pantalla de ofertas.
 @Composable
 fun SolicitudCard(
     solicitud: SolicitudEntity,
     onEliminar: () -> Unit,
+    onVerOfertas: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val tieneOfertas = solicitud.estado == ESTADO_CON_OFERTAS || solicitud.estado == ESTADO_FINALIZADA
+
     //Si la superficie es entera (10.0) se muestra "10", si tiene decimales se deja igual.
     val superficieTexto = if (solicitud.superficieHa % 1.0 == 0.0) {
         solicitud.superficieHa.toInt().toString()
@@ -38,7 +43,9 @@ fun SolicitudCard(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (tieneOfertas) Modifier.clickable { onVerOfertas() } else Modifier),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -54,6 +61,9 @@ fun SolicitudCard(
             }
             Column(horizontalAlignment = Alignment.End) {
                 ChipEstado(solicitud.estado)
+                if (tieneOfertas) {
+                    Text("Ver ofertas", style = MaterialTheme.typography.labelSmall, color = AzulTechFlex)
+                }
                 if (solicitud.estado == ESTADO_PENDIENTE) {
                     IconButton(onClick = onEliminar) {
                         Icon(Icons.Filled.Delete, contentDescription = "Eliminar solicitud")

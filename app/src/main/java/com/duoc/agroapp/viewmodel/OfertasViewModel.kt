@@ -4,22 +4,38 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.duoc.agroapp.data.demo.OfertasDemo
-import com.duoc.agroapp.model.OfertaEjemplo
+import androidx.lifecycle.viewModelScope
+import com.duoc.agroapp.model.OFERTA_PENDIENTE
+import com.duoc.agroapp.model.OfertaConPrestador
 import com.duoc.agroapp.model.OfertasEstadoUI
+import com.duoc.agroapp.repository.OfertasRecibidasRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-//Maneja favoritos, aceptación y contacto de ofertas. Es una simulación: nada se guarda.
-class OfertasViewModel : ViewModel() {
+//Carga las ofertas de una solicitud y maneja favoritos, aceptación y contacto.
+class OfertasViewModel(
+    private val repository: OfertasRecibidasRepository
+) : ViewModel() {
 
     var estadoUI by mutableStateOf(OfertasEstadoUI())
         private set
 
-    init {
-        //Como en el diseño, el prestador de 5,0 parte marcado con la estrella.
-        estadoUI = estadoUI.copy(ofertas = OfertasDemo.obtenerOfertas(), favoritosIds = setOf(3))
+    //Escucha de la solicitud actual; se cancela al abrir otra solicitud.
+    private var trabajoOfertas: Job? = null
+
+    //Se llama cada vez que se abre la pantalla, con el id de la solicitud tocada.
+    fun cargar(solicitudId: Int) {
+        trabajoOfertas?.cancel()
+        estadoUI = estadoUI.copy(ofertas = emptyList(), cargando = true)
+        trabajoOfertas = viewModelScope.launch {
+            //Cada vez que llega una oferta nueva o cambia una, la lista se actualiza sola.
+            repository.obtenerOfertas(solicitudId).collect { lista ->
+                estadoUI = estadoUI.copy(ofertas = lista, cargando = false)
+            }
+        }
     }
 
-    //Marca o desmarca la estrella de un prestador.
+    //Marca o desmarca la estrella de una oferta.
     fun onFavoritoClick(idOferta: Int) {
         val nuevos = if (estadoUI.favoritosIds.contains(idOferta)) {
             estadoUI.favoritosIds - idOferta
@@ -29,9 +45,9 @@ class OfertasViewModel : ViewModel() {
         estadoUI = estadoUI.copy(favoritosIds = nuevos)
     }
 
-    //Regla de negocio: solo se puede aceptar una oferta; después las demás quedan bloqueadas.
-    fun onAceptarClick(oferta: OfertaEjemplo) {
-        if (estadoUI.ofertaAceptadaId == null) {
+    //Regla de negocio: solo se puede aceptar una oferta que sigue pendiente.
+    fun onAceptarClick(oferta: OfertaConPrestador) {
+        if (oferta.oferta.estado == OFERTA_PENDIENTE) {
             estadoUI = estadoUI.copy(ofertaPorAceptar = oferta)
         }
     }
@@ -42,11 +58,13 @@ class OfertasViewModel : ViewModel() {
 
     fun onConfirmarAceptar() {
         val oferta = estadoUI.ofertaPorAceptar ?: return
-        estadoUI = estadoUI.copy(ofertaAceptadaId = oferta.id, ofertaPorAceptar = null)
+        viewModelScope.launch {
+            repository.aceptarOferta(oferta.oferta)
+            estadoUI = estadoUI.copy(ofertaPorAceptar = null)
+        }
     }
 
-    //Simula el envío de un mensaje al prestador.
-    fun onContactarClick(oferta: OfertaEjemplo) {
+    fun onContactarClick(oferta: OfertaConPrestador) {
         estadoUI = estadoUI.copy(ofertaContactada = oferta)
     }
 

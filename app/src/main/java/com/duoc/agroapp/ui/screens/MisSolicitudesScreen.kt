@@ -1,28 +1,23 @@
 package com.duoc.agroapp.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.duoc.agroapp.R
 import com.duoc.agroapp.ui.components.SolicitudCard
 import com.duoc.agroapp.viewmodel.MisSolicitudesViewModel
 
 @Composable
 fun MisSolicitudesScreen(
     viewModel: MisSolicitudesViewModel,
-    onNuevaSolicitud: () -> Unit
+    onNuevaSolicitud: () -> Unit,
+    onVerOfertas: (Int) -> Unit
 ) {
     val estado = viewModel.estadoUI
 
@@ -30,39 +25,8 @@ fun MisSolicitudesScreen(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .padding(
-                start = 16.dp,
-                end = 16.dp,
-                top = 8.dp,
-                bottom = 16.dp
-            )
+            .padding(16.dp)
     ) {
-
-        // Fila superior con el logo a la izquierda y el usuario a la derecha
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_tecmundo_connect),
-                contentDescription = "Logo Tecmundo",
-                modifier = Modifier.height(50.dp),
-                contentScale = ContentScale.Fit
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.placeholder_user),
-                contentDescription = "Perfil de usuario",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-        }
-
         Text("Mis solicitudes", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(12.dp))
 
@@ -89,10 +53,12 @@ fun MisSolicitudesScreen(
             }
             else -> {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    //La key permite que al eliminar una tarjeta, las demás se muevan con animación.
                     items(estado.solicitudes, key = { solicitud -> solicitud.id }) { solicitud ->
                         SolicitudCard(
                             solicitud = solicitud,
                             onEliminar = { viewModel.onEliminarClick(solicitud) },
+                            onVerOfertas = { onVerOfertas(solicitud.id) },
                             modifier = Modifier.animateItem()
                         )
                     }
