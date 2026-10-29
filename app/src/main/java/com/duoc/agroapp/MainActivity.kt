@@ -13,10 +13,12 @@ import com.duoc.agroapp.repository.SolicitudRepository
 import com.duoc.agroapp.ui.screens.CrearSolicitudScreen
 import com.duoc.agroapp.ui.screens.LoginScreen
 import com.duoc.agroapp.ui.screens.MisSolicitudesScreen
+import com.duoc.agroapp.ui.screens.OfertasScreen
 import com.duoc.agroapp.ui.theme.AgroAppTheme
 import com.duoc.agroapp.viewmodel.CrearSolicitudViewModel
 import com.duoc.agroapp.viewmodel.LoginViewModel
 import com.duoc.agroapp.viewmodel.MisSolicitudesViewModel
+import com.duoc.agroapp.viewmodel.OfertasViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,12 +34,15 @@ class MainActivity : ComponentActivity() {
         //Correo temporal: cuando el login pase el usuario, se reemplaza por el real.
         val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
         val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
+        //Datos ficticios: no depende de la base de datos.
+        val ofertasViewModel = OfertasViewModel()
 
         setContent {
             AgroAppTheme {
                 val navController = rememberNavController()
-                //Para probar otra pantalla, cambia startDestination: "login", "mis_solicitudes" o "crear_solicitud".
-                NavHost(navController = navController, startDestination = "login") {
+                //Para probar otra pantalla, cambia startDestination:
+                //"login", "mis_solicitudes", "crear_solicitud" u "ofertas".
+                NavHost(navController = navController, startDestination = "ofertas") {
                     composable("login") { LoginScreen(viewModel = viewModel) }
                     composable("mis_solicitudes") {
                         MisSolicitudesScreen(
@@ -49,6 +54,12 @@ class MainActivity : ComponentActivity() {
                         CrearSolicitudScreen(
                             viewModel = crearSolicitudViewModel,
                             onSolicitudCreada = { navController.popBackStack() },
+                            onVolver = { navController.popBackStack() }
+                        )
+                    }
+                    composable("ofertas") {
+                        OfertasScreen(
+                            viewModel = ofertasViewModel,
                             onVolver = { navController.popBackStack() }
                         )
                     }

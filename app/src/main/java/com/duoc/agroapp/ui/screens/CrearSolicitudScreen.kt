@@ -1,10 +1,12 @@
 package com.duoc.agroapp.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -15,13 +17,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.duoc.agroapp.R
 import com.duoc.agroapp.model.OBSTACULOS_DISPONIBLES
 import com.duoc.agroapp.model.OBSTACULO_OTROS
 import com.duoc.agroapp.model.OPCIONES_APLICACION
 import com.duoc.agroapp.model.TIPOS_PRODUCTO
+import com.duoc.agroapp.ui.components.CamaraFotos
 import com.duoc.agroapp.viewmodel.CrearSolicitudViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,30 +41,42 @@ fun CrearSolicitudScreen(
     val estado = viewModel.estadoUI
     var menuExpandido by remember { mutableStateOf(false) }
 
-    //Cuando se guarda la solicitud, se navega a la pantalla siguiente.
-    LaunchedEffect(estado.guardadoExitoso) {
-        if (estado.guardadoExitoso) {
-            viewModel.onNavegacionConsumida()
-            onSolicitudCreada()
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 16.dp
+            )
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onVolver) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-            }
-            Text("Crear Solicitud", style = MaterialTheme.typography.headlineMedium)
-        }
 
+        // Fila superior con el logo a la izquierda y el usuario a la derecha
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = com.duoc.agroapp.R.drawable.logo_tecmundo_connect),
+                contentDescription = "Logo Tecmundo",
+                modifier = Modifier.height(50.dp),
+                contentScale = ContentScale.Fit
+            )
+
+            Image(
+                painter = painterResource(id = R.drawable.placeholder_user),
+                contentDescription = "Perfil de usuario",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        }
         // Tipo de producto (desplegable)
         ExposedDropdownMenuBox(expanded = menuExpandido, onExpandedChange = { menuExpandido = it }) {
             OutlinedTextField(
@@ -160,6 +179,15 @@ fun CrearSolicitudScreen(
             minLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
+
+        // Foto del terreno (recurso nativo: cámara)
+        CamaraFotos(
+            onFotoCapturada = { viewModel.onFotoCapturada(it) },
+            onPermisoDenegado = { viewModel.onPermisoCamaraDenegado() }
+        )
+        estado.errorFoto?.let {
+            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        }
 
         if (estado.guardando) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
