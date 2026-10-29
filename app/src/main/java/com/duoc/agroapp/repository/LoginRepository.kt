@@ -2,6 +2,7 @@ package com.duoc.agroapp.repository
 
 import com.duoc.agroapp.data.local.UserDao
 import com.duoc.agroapp.data.local.UserEntity
+import com.duoc.agroapp.model.LoginResultado
 import kotlinx.coroutines.flow.Flow
 
 //Union de viewmodel y Dao
@@ -11,15 +12,27 @@ class LoginRepository(private val userDao: UserDao) {
     suspend fun obtenerUltimoUsuario(): UserEntity? {
         return userDao.obtenerUltimoUsuario()
     }
-    //Simula el login.
-    suspend fun simularLoginExitoso(email: String, contrasena: String, mantener: Boolean) {
-        //Se limpia sesion vieja
-        userDao.desmarcarUltimosUsuarios()
 
-        if (mantener) {
-            // Se guarda al usuario como recordado.
-        val usuario = UserEntity(email = email, contrasena = contrasena, esUltimoLogeado = true)
-        userDao.guardarUsuario(usuario)
+    //Funcion de inicio de sesion (mas robusta, sin simulacion.)
+    suspend fun iniciarSesion(email: String, contrasena: String, mantener: Boolean): LoginResultado {
+        val usuario = userDao.buscarPorEmail(email)
+            ?: return LoginResultado(
+                exito = false,
+                errorMsg = "No existe una cuenta con este correo"
+            )
+
+        if (usuario.contrasena != contrasena) {
+            return LoginResultado(exito = false, errorMsg = "Contraseña incorrecta")
         }
+
+        //Se limpia la sesión anterior, si "Recuérdame" esta marcado, se recuerda a este usuario.
+        userDao.desmarcarUltimosUsuarios()
+        if (mantener) userDao.marcarComoLogeado(email)
+        return LoginResultado(exito = true)
+    }
+
+    //Cerrar sesion (en gestor de perfil)
+    suspend fun cerrarSesion() {
+        userDao.desmarcarUltimosUsuarios()
     }
 }

@@ -10,25 +10,29 @@ import androidx.lifecycle.viewModelScope
 import com.duoc.agroapp.model.LoginResultado
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 //Se recolecta la logica de negocio del repository y se crean funciones para la ui, validaciones y verificaciones en los inputs.
 class LoginViewModel(private val repository: LoginRepository): ViewModel() {
     var estadoUI by mutableStateOf(LoginEstadoUI())
         private set
+
     init {
         viewModelScope.launch {
             val usuario = withContext(Dispatchers.IO) {
                 repository.obtenerUltimoUsuario()
             }
-                if (usuario != null) {
-                    estadoUI = estadoUI.copy(
-                        loginResultado = LoginResultado(exito = true)
-                    )
-                }
+            if (usuario != null) {
+
+                //El correo que guarda el perfil, se almacena aqui, para que el remember entienda a quien mostrar.
+                PerfilViewModel.emailUsuarioLogueado = usuario.email
+
+                estadoUI = estadoUI.copy(
+                    loginResultado = LoginResultado(exito = true)
+                )
             }
         }
+    }
 
     fun cambiarMantener(valor: Boolean) {
         estadoUI = estadoUI.copy(mantener = valor)
@@ -46,7 +50,7 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
 
     //Verifica que los campos no esten vacios y que el campo de email tenga un "@".
     //guardarDatos se utiliza para darle valor real al checkbox de recuerdame
-    fun iniciarSesion() {
+    fun iniciarSesionVal() {
         if (estadoUI.email.isBlank() || estadoUI.password.isBlank()) {
             estadoUI = estadoUI.copy(
                 loginResultado = LoginResultado(
@@ -72,13 +76,25 @@ class LoginViewModel(private val repository: LoginRepository): ViewModel() {
         viewModelScope.launch {
             estadoUI = estadoUI.copy(cargando = true)
 
-            // Guardamos en Room usando repository
-            repository.simularLoginExitoso(estadoUI.email, estadoUI.password, estadoUI.mantener)
+            //El repositorio ya devuelve si fue exitoso y, si no, el mensaje de error.
+            val resultado =
+                repository.iniciarSesion(estadoUI.email, estadoUI.password, estadoUI.mantener)
 
-            estadoUI = estadoUI.copy(
-                cargando = false,
-                loginResultado = LoginResultado(exito = true)
-            )
+            if (resultado.exito) {
+                PerfilViewModel.emailUsuarioLogueado = estadoUI.email
+            }
+
+            estadoUI = estadoUI.copy(cargando = false, loginResultado = resultado)
+        }
+    }
+
+    fun cerrarSesion(onResultado: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.cerrarSesion() //El cierre de sesion es lo que se espera antes del cambio.
+            withContext(Dispatchers.Main) { //Carril actualizacion de ui para main
+                estadoUI = LoginEstadoUI()
+                onResultado()
+            }
         }
     }
 }

@@ -3,7 +3,6 @@ package com.duoc.agroapp.ui.screens
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,11 +15,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import com.duoc.agroapp.R
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.*
 val AzulTechFlex = Color(0xFF3668FF)
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
+fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit, onNavigateToRegister: () -> Unit  ) {
     // con el valor de estado se va actualizando por cada input.
     val estado = viewModel.estadoUI
 
@@ -29,6 +27,8 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
     //Variables usadas para el modal de recuperar contraseña.
     var ModalRecuperar by remember {mutableStateOf(false)}
 
+    // Reacciona automáticamente cuando loginResultado cambia a éxito.
+    // Esto maneja el pase automático del Room y el inicio de sesión manual.
     LaunchedEffect(estado.loginResultado) {
         if (estado.loginResultado?.exito == true) {
             onLoginSuccess()
@@ -116,7 +116,7 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
         } else {
             // Si no está cargando, muestra el botón normal
             Button(
-                onClick = { viewModel.iniciarSesion() },
+                onClick = { viewModel.iniciarSesionVal() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AzulTechFlex
@@ -153,7 +153,7 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
         Text(
             text = "¿No tienes cuenta? Regístrate",
             modifier = Modifier
-                .clickable { /* Logica de nav al registro aqui. */ }
+                .clickable { onNavigateToRegister() }
                 .padding(8.dp)
         )
 
@@ -216,7 +216,6 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit ) {
             )
         }
     }
-
 }
 
 
