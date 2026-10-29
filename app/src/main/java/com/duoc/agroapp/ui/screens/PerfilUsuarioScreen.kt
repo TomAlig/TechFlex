@@ -36,7 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
-fun PerfilUsuarioScreen(viewmodel: PerfilViewModel, onCerrarSesion: () -> Unit) {
+fun PerfilUsuarioScreen(viewmodel: PerfilViewModel, onCerrarSesion: () -> Unit,  onVolver: () -> Unit) {
 
     //Context para toast (mensaje en respuesta a los cambios del perfil).)
     val context = LocalContext.current
@@ -77,7 +77,7 @@ fun PerfilUsuarioScreen(viewmodel: PerfilViewModel, onCerrarSesion: () -> Unit) 
             ) {
                 // Flecha volver (sin funcion)
                 IconButton(
-                    onClick = { },
+                    onClick = onVolver,
                     modifier = Modifier.padding(end = 8.dp) // Separa la flecha del logo
                 ) {
                     Icon(
