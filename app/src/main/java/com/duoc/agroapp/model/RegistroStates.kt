@@ -4,6 +4,9 @@ package com.duoc.agroapp.model
 const val TIPO_PRESTADOR = "Prestador"
 const val TIPO_PRODUCTOR = "Productor"
 
+//Tipo especial: no aparece en el registro, solo lo tiene la cuenta admin que crea la app.
+const val TIPO_ADMIN = "Administrador"
+
 //Estado completo del formulario "Registro".
 data class RegistroEstadoUI(
     val rut: String = "",
@@ -12,10 +15,8 @@ data class RegistroEstadoUI(
     val contrasena: String = "",
     val repetirContrasena: String = "",
     val telefono: String = "",
-    //null = todavía no elige; en el mockup ninguna opción viene marcada.
     val suscritoNovedades: Boolean? = null,
     val tipoUsuario: String? = null,
-
     //Un error por campo (null = campo válido).
     val errorRut: String? = null,
     val errorNombre: String? = null,
