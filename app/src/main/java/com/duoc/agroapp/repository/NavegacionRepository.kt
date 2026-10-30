@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import com.duoc.agroapp.ui.navigation.NavegacionItem
 
 class NavegacionRepository (private val userDao: UserDao) {
@@ -30,6 +31,14 @@ class NavegacionRepository (private val userDao: UserDao) {
                     titulo = "Buscar Cerca",
                     ruta = "solicitudes_cerca",
                     icono = Icons.Default.LocationOn
+                )
+            )
+            //El admin ve su vista de usuarios (y Mi Perfil, que se suma abajo para todos).
+            "Administrador" -> listOf(
+                NavegacionItem(
+                    titulo = "Usuarios",
+                    ruta = "admin",
+                    icono = Icons.Default.Settings
                 )
             )
 

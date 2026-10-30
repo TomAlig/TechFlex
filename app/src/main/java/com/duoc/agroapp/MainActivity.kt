@@ -37,18 +37,18 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
-
+import com.duoc.agroapp.repository.AdminRepository
 import com.duoc.agroapp.repository.NavegacionRepository
 import com.duoc.agroapp.repository.OfertaRepository
-
+import com.duoc.agroapp.repository.OfertasRecibidasRepository
+import com.duoc.agroapp.ui.screens.AdminScreen
 import com.duoc.agroapp.ui.screens.DetalleOfertaScreen
-
+import com.duoc.agroapp.ui.screens.OfertasScreen
+import com.duoc.agroapp.viewmodel.AdminViewModel
 import com.duoc.agroapp.viewmodel.DetalleOfertaViewModel
 import com.duoc.agroapp.viewmodel.NavViewModel
-import kotlinx.coroutines.launch
-import com.duoc.agroapp.repository.OfertasRecibidasRepository
-import com.duoc.agroapp.ui.screens.OfertasScreen
 import com.duoc.agroapp.viewmodel.OfertasViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,8 +76,13 @@ class MainActivity : ComponentActivity() {
             database.ofertaDao(), database.solicitudDao(), dao
         )
         val ofertasViewModel = OfertasViewModel(ofertasRecibidasRepository)
-        //Administrador: crea la cuenta admin la primera vez que se abre la app.
 
+        //Administrador: crea la cuenta admin la primera vez que se abre la app.
+        val adminRepository = AdminRepository(dao)
+        val adminViewModel = AdminViewModel(adminRepository)
+        lifecycleScope.launch {
+            adminRepository.crearAdminSiNoExiste()
+        }
 
         setContent {
             AgroAppTheme {
@@ -210,6 +215,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        composable("admin") {
+                            AdminScreen(viewModel = adminViewModel)
+                        }
+
                         composable("registro") {
                             RegistroScreen(
                                 viewModel = registroViewModel,
@@ -237,7 +246,6 @@ class MainActivity : ComponentActivity() {
                                     //Al hacer click en la flecha para atras, se devuelve una pagina del monton.
                                     navController.popBackStack()
                                 }
-
                             )
                         }
                     }

@@ -5,7 +5,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.lifecycle.LiveData
+import androidx.room.Delete
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 //Se define como Dao
 @Dao
@@ -47,4 +49,13 @@ interface UserDao {
     //Query que verifica el usuario en cualquier contexto, sin importar si está recordado a través de su PK.
     @Query("SELECT * FROM usuarios_tabla WHERE email = :email LIMIT 1")
     fun obtenerUsuarioPorEmailLiveData(email: String): LiveData<UserEntity?>
+
+    //Todos los usuarios menos el admin, ordenados por nombre. Lo usa la vista del administrador.
+    //Es Flow: cuando se elimina un usuario, la lista se actualiza sola.
+    @Query("SELECT * FROM usuarios_tabla WHERE tipoUsuario != 'Administrador' ORDER BY nombre ASC")
+    fun obtenerUsuariosParaAdmin(): Flow<List<UserEntity>>
+
+    //Elimina un usuario de la tabla.
+    @Delete
+    suspend fun eliminarUsuario(usuario: UserEntity)
 }
