@@ -45,6 +45,7 @@ fun CrearSolicitudScreen(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .verticalScroll(rememberScrollState())
             .padding(
                 start = 16.dp,
                 end = 16.dp,

@@ -15,19 +15,14 @@ class NavegacionRepository (private val userDao: UserDao) {
             "Productor" -> listOf(
                 NavegacionItem(
                     titulo = "Nueva Solicitud",
-                    ruta =  "crear_solicitud",
+                    ruta = "crear_solicitud",
                     icono = Icons.Default.AddCircle
                 ),
                 NavegacionItem(
                     titulo = "Mis Solicitudes",
                     ruta = "mis_solicitudes",
                     icono = Icons.Default.List
-                ),
-                NavegacionItem(
-                    titulo = "ofertas",
-                    ruta = "ofertas",
-                    icono = Icons.Default.List
-                ),
+                )
             )
 
             "Prestador" -> listOf(
