@@ -40,11 +40,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.duoc.agroapp.repository.AdminRepository
 import com.duoc.agroapp.repository.NavegacionRepository
 import com.duoc.agroapp.repository.OfertaRepository
+import com.duoc.agroapp.repository.OfertasRecibidasRepository
 import com.duoc.agroapp.ui.screens.AdminScreen
 import com.duoc.agroapp.ui.screens.DetalleOfertaScreen
+import com.duoc.agroapp.ui.screens.OfertasScreen
 import com.duoc.agroapp.viewmodel.AdminViewModel
 import com.duoc.agroapp.viewmodel.DetalleOfertaViewModel
 import com.duoc.agroapp.viewmodel.NavViewModel
+import com.duoc.agroapp.viewmodel.OfertasViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -69,6 +72,11 @@ class MainActivity : ComponentActivity() {
         val navegacionRepository = NavegacionRepository(dao)
         val ofertaRepository = OfertaRepository(database.ofertaDao(), database.solicitudDao())
         val detalleOfertaViewModel = DetalleOfertaViewModel(ofertaRepository)
+        val ofertasRecibidasRepository = OfertasRecibidasRepository(
+            database.ofertaDao(), database.solicitudDao(), dao
+        )
+        val ofertasViewModel = OfertasViewModel(ofertasRecibidasRepository)
+
         //Administrador: crea la cuenta admin la primera vez que se abre la app.
         val adminRepository = AdminRepository(dao)
         val adminViewModel = AdminViewModel(adminRepository)
@@ -104,128 +112,140 @@ class MainActivity : ComponentActivity() {
                         if (mostrarMenu) {
                             NavigationBar {
                                 menuItems.forEach { item ->
-                                            NavigationBarItem(
-                                                icon = {
-                                                    Icon(
-                                                        imageVector = item.icono,
-                                                        contentDescription = item.titulo
-                                                    )
-                                                },
-                                                label = {
-                                                    Text(text = item.titulo)
-                                                },
-                                                selected = rutaActual == item.ruta,
-                                                onClick = {
-                                                    if (rutaActual != item.ruta) {
-                                                        navController.navigate(item.ruta) {
-                                                            launchSingleTop = true
-                                                        }
-                                                    }
-                                                }
+                                    NavigationBarItem(
+                                        icon = {
+                                            Icon(
+                                                imageVector = item.icono,
+                                                contentDescription = item.titulo
                                             )
+                                        },
+                                        label = {
+                                            Text(text = item.titulo)
+                                        },
+                                        selected = rutaActual == item.ruta,
+                                        onClick = {
+                                            if (rutaActual != item.ruta) {
+                                                navController.navigate(item.ruta) {
+                                                    launchSingleTop = true
+                                                }
+                                            }
                                         }
-                                    }
+                                    )
+                                }
+                            }
                         }
                     }
                 ) { paddingValues ->
-                NavHost(navController = navController, startDestination = "login", modifier = Modifier.padding(paddingValues)) {
-                    composable("login") {
-                        LoginScreen(
-                            viewModel = viewModel,
-                            onLoginSuccess = { //Vaw ingresando tras un login exitoso.
-                                //Se toma el dato del usuario logueado de perfilrepo.
-                                val correo = PerfilViewModel.emailUsuarioLogueado
+                    NavHost(navController = navController, startDestination = "login", modifier = Modifier.padding(paddingValues)) {
+                        composable("login") {
+                            LoginScreen(
+                                viewModel = viewModel,
+                                onLoginSuccess = { //Vaw ingresando tras un login exitoso.
+                                    //Se toma el dato del usuario logueado de perfilrepo.
+                                    val correo = PerfilViewModel.emailUsuarioLogueado
 
-                                if (correo != "") {
-                                    lifecycleScope.launch {
-                                        val usuarioActual = dao.buscarPorEmail(correo)
+                                    if (correo != "") {
+                                        lifecycleScope.launch {
+                                            val usuarioActual = dao.buscarPorEmail(correo)
 
-                                        val tipoUsuario = usuarioActual?.tipoUsuario
+                                            val tipoUsuario = usuarioActual?.tipoUsuario
 
-                                        if (tipoUsuario != null) {
-                                            navViewModel.cargarMenu(tipoUsuario)
-                                            val destinoInicial = when (tipoUsuario) {
-                                                "Productor" -> "mis_solicitudes"
-                                                "Prestador" -> "solicitudes_cerca"
-                                                "Administrador" -> "admin"
-                                                else -> "perfil"
+                                            if (tipoUsuario != null) {
+                                                navViewModel.cargarMenu(tipoUsuario)
+                                                val destinoInicial = when (tipoUsuario) {
+                                                    "Productor" -> "mis_solicitudes"
+                                                    "Prestador" -> "solicitudes_cerca"
+                                                    "Administrador" -> "admin"
+                                                    else -> "perfil"
+                                                }
+                                                navController.navigate(destinoInicial) {
+                                                    //saca login para que no aparezca al apretar hacia atras en el telefono.
+                                                    popUpTo("login") { inclusive = true }
+                                                }
                                             }
-                                            navController.navigate(destinoInicial) {
-                                                //saca login para que no aparezca al apretar hacia atras en el telefono.
-                                                popUpTo("login") { inclusive = true }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            onNavigateToRegister = { //nav a registro por el boton correspondiente.
-                                navController.navigate("registro")
-                            }
-                        )
-                    }
-
-                    composable("mis_solicitudes") {
-                        MisSolicitudesScreen(
-                            viewModel = misSolicitudesViewModel,
-                            onNuevaSolicitud = { navController.navigate("crear_solicitud") }
-                        )
-                    }
-
-                    composable("crear_solicitud") {
-                        CrearSolicitudScreen(
-                            viewModel = crearSolicitudViewModel,
-                            onSolicitudCreada = { navController.popBackStack() },
-                            onVolver = { navController.popBackStack() }
-                        )
-                    }
-
-                    composable("solicitudes_cerca") {
-                        SolicitudesCercaScreen(
-                            viewModel = solicitudesCercaViewModel,
-                            onVerDetalle = { id -> navController.navigate("detalle/$id") }
-                        )
-                    }
-
-                    composable("detalle/{id}") { entrada ->
-                        //La ruta siempre llega como texto, así que se convierte a número.
-                        val id = entrada.arguments?.getString("id")?.toIntOrNull() ?: 0
-                        DetalleOfertaScreen(
-                            viewModel = detalleOfertaViewModel,
-                            solicitudId = id,
-                            onVolver = { navController.popBackStack() }
-                        )
-                    }
-                    composable("admin") {
-                        AdminScreen(viewModel = adminViewModel)
-                    }
-                    composable("registro") {
-                        RegistroScreen(
-                            viewModel = registroViewModel,
-                            onRegistroExitoso = {
-                                //Después de registrarse va al login, y el registro sale del historial
-                                //para que el botón "atrás" no vuelva al formulario.
-                                navController.navigate("login") {
-                                    popUpTo("registro") { inclusive = true }
-                                }
-                            }
-                        )
-                    }
-
-                    composable("perfil") {
-                        PerfilUsuarioScreen(
-                            viewmodel = perfilViewModel,
-                            onCerrarSesion = {
-                                viewModel.cerrarSesion {
-                                    navController.navigate("login") {
-                                        popUpTo("perfil") { inclusive = true }
                                         }
                                     }
                                 },
-                            onVolver = {
-                                //Al hacer click en la flecha para atras, se devuelve una pagina del monton.
-                                navController.popBackStack()
-                            }
+                                onNavigateToRegister = { //nav a registro por el boton correspondiente.
+                                    navController.navigate("registro")
+                                }
+                            )
+                        }
 
+                        composable("mis_solicitudes") {
+                            MisSolicitudesScreen(
+                                viewModel = misSolicitudesViewModel,
+                                onNuevaSolicitud = { navController.navigate("crear_solicitud") },
+                                onVerOfertas = { id -> navController.navigate("ofertas/$id") }
+                            )
+                        }
+
+                        composable("ofertas/{id}") { entrada ->
+                            //La ruta siempre llega como texto, así que se convierte a número.
+                            val id = entrada.arguments?.getString("id")?.toIntOrNull() ?: 0
+                            OfertasScreen(
+                                viewModel = ofertasViewModel,
+                                solicitudId = id,
+                                onVolver = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("crear_solicitud") {
+                            CrearSolicitudScreen(
+                                viewModel = crearSolicitudViewModel,
+                                onSolicitudCreada = { navController.popBackStack() },
+                                onVolver = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("solicitudes_cerca") {
+                            SolicitudesCercaScreen(
+                                viewModel = solicitudesCercaViewModel,
+                                onVerDetalle = { id -> navController.navigate("detalle/$id") }
+                            )
+                        }
+
+                        composable("detalle/{id}") { entrada ->
+                            //La ruta siempre llega como texto, así que se convierte a número.
+                            val id = entrada.arguments?.getString("id")?.toIntOrNull() ?: 0
+                            DetalleOfertaScreen(
+                                viewModel = detalleOfertaViewModel,
+                                solicitudId = id,
+                                onVolver = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("admin") {
+                            AdminScreen(viewModel = adminViewModel)
+                        }
+
+                        composable("registro") {
+                            RegistroScreen(
+                                viewModel = registroViewModel,
+                                onRegistroExitoso = {
+                                    //Después de registrarse va al login, y el registro sale del historial
+                                    //para que el botón "atrás" no vuelva al formulario.
+                                    navController.navigate("login") {
+                                        popUpTo("registro") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+
+                        composable("perfil") {
+                            PerfilUsuarioScreen(
+                                viewmodel = perfilViewModel,
+                                onCerrarSesion = {
+                                    viewModel.cerrarSesion {
+                                        navController.navigate("login") {
+                                            popUpTo("perfil") { inclusive = true }
+                                        }
+                                    }
+                                },
+                                onVolver = {
+                                    //Al hacer click en la flecha para atras, se devuelve una pagina del monton.
+                                    navController.popBackStack()
+                                }
                             )
                         }
                     }

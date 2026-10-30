@@ -19,10 +19,13 @@ data class CrearSolicitudEstadoUI(
     val aplicacion: String = "Diurna",
     val obstaculos: Set<String> = emptySet(),
     val comentarios: String = "",
+    val fotoUri: String? = null,
+
     //Un error por campo (null = campo válido).
     val errorTipoProducto: String? = null,
     val errorSuperficie: String? = null,
     val errorComentarios: String? = null,
+    val errorFoto: String? = null,
     val mostrarDialogoConfirmacion: Boolean = false,
     val guardando: Boolean = false,
     val guardadoExitoso: Boolean = false

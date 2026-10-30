@@ -50,6 +50,15 @@ class CrearSolicitudViewModel(
         estadoUI = estadoUI.copy(comentarios = valor, errorComentarios = null)
     }
 
+    //Guarda la ruta de la foto tomada con la cámara.
+    fun onFotoCapturada(uri: String) {
+        estadoUI = estadoUI.copy(fotoUri = uri, errorFoto = null)
+    }
+
+    fun onPermisoCamaraDenegado() {
+        estadoUI = estadoUI.copy(errorFoto = "Sin permiso de cámara no se puede tomar la foto")
+    }
+
     //Valida todos los campos; si todo está bien, abre el modal de confirmación.
     fun onEnviarClick() {
         val errorTipo = SolicitudValidator.validarTipoProducto(estadoUI.tipoProducto)
@@ -84,7 +93,8 @@ class CrearSolicitudViewModel(
                     tieneAgua = estadoUI.tieneAgua,
                     aplicacion = estadoUI.aplicacion,
                     obstaculos = estadoUI.obstaculos.joinToString(","),
-                    comentarios = estadoUI.comentarios.trim()
+                    comentarios = estadoUI.comentarios.trim(),
+                    fotoUri = estadoUI.fotoUri
                 )
             )
             estadoUI = estadoUI.copy(guardando = false, guardadoExitoso = true)

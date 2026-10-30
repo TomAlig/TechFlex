@@ -16,7 +16,7 @@ class NavegacionRepository (private val userDao: UserDao) {
             "Productor" -> listOf(
                 NavegacionItem(
                     titulo = "Nueva Solicitud",
-                    ruta =  "crear_solicitud",
+                    ruta = "crear_solicitud",
                     icono = Icons.Default.AddCircle
                 ),
                 NavegacionItem(
