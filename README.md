@@ -55,9 +55,9 @@ No forma parte del flujo principal Productor-Prestador, ya que su función es ma
 
   **pipl3n, ignmartinezt** - 20/10/2026 - Se desarrollan versiones funcionales para múltiples vistas, **Crear Solicitud, Mis Solicitudes, Solicitudes Cerca**.
 
-  **TomAlig** - 23/10/2026 / 25/10/2026 - Se realizan ajustes al maquetado inicial del Login, se desarrollan los flujos de inicio y cierre de sesión, y "Recuerdame" con Room.
+  **TomAlig** - 23/10/2026 / 25/10/2026 - Se realizan ajustes al maquetado inicial del Login, se desarrollan los flujos de inicio y cierre de sesión, y "Recuérdame" con Room.
 
-  **ignmartinezt** - 26/10/2026 - Se desarrolla la vista de **Registro** su estilizado, funcionalidades y enrutamiento.
+  **ignmartinezt** - 26/10/2026 - Se desarrolla la vista de **Registro**, su estilizado, funcionalidades y enrutamiento.
 
   **TomAlig** - 28/10/2026 - Se desarrolla la vista de **Perfil** de usuario funcional y el menú de navegación para la App.
 
