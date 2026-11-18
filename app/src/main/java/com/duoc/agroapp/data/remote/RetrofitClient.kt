@@ -23,9 +23,9 @@ object RetrofitClient {
         retrofit.create(SolicitudApiService::class.java)
     }
 
-    //val ofertaApi: OfertaApiService by lazy {
-    //    retrofit.create(OfertaApiService::class.java)
-    //}
+    val ofertaApi: OfertaApiService by lazy {
+        retrofit.create(OfertaApiService::class.java)
+    }
 }
 
     /*Se agregan bloques para distintos endpoints en formato

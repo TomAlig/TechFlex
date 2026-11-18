@@ -4,6 +4,7 @@ import com.duoc.agroapp.data.local.OfertaDao
 import com.duoc.agroapp.data.local.OfertaEntity
 import com.duoc.agroapp.data.local.SolicitudDao
 import com.duoc.agroapp.data.local.SolicitudEntity
+import com.duoc.agroapp.data.remote.RetrofitClient
 import com.duoc.agroapp.model.ESTADO_CON_OFERTAS
 
 //Une el ViewModel del Detalle con las tablas de ofertas y solicitudes.
@@ -27,8 +28,23 @@ class OfertaRepository(
         if (yaOferto(oferta.solicitudId, oferta.emailPrestador)) {
             return "Ya enviaste una oferta para esta solicitud"
         }
-        ofertaDao.guardarOferta(oferta)
-        solicitudDao.actualizarEstado(oferta.solicitudId, ESTADO_CON_OFERTAS)
+
+        val ofertaEnXano = RetrofitClient.ofertaApi.crearOferta(oferta)
+        ofertaDao.guardarOferta(oferta.copy(id = ofertaEnXano.id))
+
+        val solicitud = solicitudDao.obtenerSolicitudPorId(oferta.solicitudId)
+        if (solicitud != null) {
+            RetrofitClient.solicitudApi.actualizarSolicitud(
+                id = oferta.solicitudId,
+                solicitud = solicitud.copy(estado = ESTADO_CON_OFERTAS)
+            )
+            solicitudDao.actualizarEstado(oferta.solicitudId, ESTADO_CON_OFERTAS)
+    }
         return null
+    }
+
+    suspend fun sincronizarConXano() {
+        val listaDeXano = RetrofitClient.ofertaApi.obtenerOfertas()
+        ofertaDao.guardarTodasLasOfertas(listaDeXano)
     }
 }

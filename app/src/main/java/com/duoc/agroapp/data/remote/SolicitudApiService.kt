@@ -4,6 +4,7 @@ import com.duoc.agroapp.data.local.SolicitudEntity
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -17,4 +18,11 @@ interface SolicitudApiService {
 
     @DELETE("solicitudes/{solicitudes_id}")
     suspend fun eliminarSolicitud(@Path("solicitudes_id") id: Int)
+
+    //Actualizacion de estado tras cambio en oferta.
+    @PATCH("solicitudes/{solicitudes_id}")
+    suspend fun actualizarSolicitud(
+        @Path("solicitudes_id") id: Int,
+        @Body solicitud: SolicitudEntity
+    ): SolicitudEntity
 }

@@ -19,6 +19,12 @@ class DetalleOfertaViewModel(
     var estadoUI by mutableStateOf(DetalleOfertaEstadoUI())
         private set
 
+    init {
+        viewModelScope.launch {
+            repository.sincronizarConXano()
+        }
+    }
+
     //Se llama cada vez que se abre el Detalle, con el id de la solicitud tocada.
     fun cargar(solicitudId: Int) {
         //Se limpia lo de la solicitud anterior (precio, errores).
