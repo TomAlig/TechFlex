@@ -27,6 +27,10 @@ class MisSolicitudesViewModel(
                 estadoUI = estadoUI.copy(solicitudes = lista, cargando = false)
             }
         }
+        //Despues de revisar room (local), trae lo de xano (nube).
+        viewModelScope.launch {
+            repository.sincronizarConXano()
+        }
     }
 
     //Regla de negocio: solo se puede eliminar una solicitud que aún no ha sido atendida (Pendiente).

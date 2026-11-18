@@ -29,6 +29,10 @@ class SolicitudesCercaViewModel(
                 estadoUI = estadoUI.copy(solicitudes = cercanas, cargando = false)
             }
         }
+        //Despues de revisar room (local), trae lo de xano (nube).
+        viewModelScope.launch {
+            repository.sincronizarConXano()
+        }
     }
 
     //Pasa de la fila de la tabla (SolicitudEntity) a lo que muestra la tarjeta (SolicitudCercana).
