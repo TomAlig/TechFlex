@@ -15,5 +15,6 @@ data class UserEntity(
     val tipoUsuario: String = "",          //"Prestador" o "Productor"
     val suscritoNovedades: Boolean = false,
     //Marca al usuario que tiene la sesión recordada (función "Recuérdame" de Tom).
-    val esUltimoLogeado: Boolean = false
+    val esUltimoLogeado: Boolean = false,
+    val id: Int = 0     //id q pone xano
 )
