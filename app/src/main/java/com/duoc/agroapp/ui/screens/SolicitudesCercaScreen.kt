@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.sp
 import com.duoc.agroapp.R
 import com.duoc.agroapp.ui.components.SolicitudCercanaCard
 import com.duoc.agroapp.viewmodel.SolicitudesCercaViewModel
+import androidx.compose.material.icons.filled.LocationOn
+import com.duoc.agroapp.ui.components.UbicacionPrestador
 
 //Vista del prestador: lista de solicitudes abiertas, de la más cercana a la más lejana.
 @Composable
@@ -62,6 +64,32 @@ fun SolicitudesCercaScreen(
         Spacer(Modifier.height(12.dp))
 
         Text("Solicitudes cerca de ti", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(8.dp))
+
+        //Si ya se leyo la ubicacion se muestra, si no aparece el boton para pedirla
+        val latitud = estado.latitud
+        val longitud = estado.longitud
+        if (latitud != null && longitud != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.LocationOn, contentDescription = null, tint = AzulTechFlex)
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = "Tu ubicación: %.4f, %.4f".format(latitud, longitud),
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+            }
+        } else {
+            UbicacionPrestador(
+                onUbicacionObtenida = { lat, lng -> viewModel.onUbicacionObtenida(lat, lng) },
+                onError = { mensaje -> viewModel.onErrorUbicacion(mensaje) }
+            )
+        }
+
+        //Mensaje si no dio permiso o no se pudo leer el gps
+        estado.errorUbicacion?.let {
+            Text(it, color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(Modifier.height(12.dp))
 
         //Tres casos: cargando, sin solicitudes o la lista
