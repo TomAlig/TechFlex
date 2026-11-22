@@ -35,6 +35,11 @@ Al ingresar con su usuario... <br>
 Este usuario viene pre-registrado, y cuenta con las mismas opciones de personalización que los demás usuarios. <br>
 No forma parte del flujo principal Productor-Prestador, ya que su función es mantener un control general sobre los usuarios y contribuir al correcto funcionamiento y organización del sistema.
 
+## ▪ Backend y Almacenamiento
+Se utiliza una estructura Local + Remoto (Room y Xano) para una sincronización bidireccional a través de Retrofit. <br>
+Xano maneja los endpoints API (`GET`, `POST`, `PATCH` y `DELETE`) y también almacena la información en la nube, desde la cual Room se alimenta para representarla al usuario.
+De esta manera, por más que no haya conexión a internet, el usuario podrá ver la información descargada desde la última vez que tuvo conexión.
+
 ## **Miembros**
 - Tomás Aliaga (TomAlig)
 - Ignacio Martinez (ignmartinezt)
@@ -64,3 +69,13 @@ No forma parte del flujo principal Productor-Prestador, ya que su función es ma
   **pipl3n, ignmartinezt** - 29/10/2026 - Se implementan la vista de **Ofertas** para el productor, **Detalle Ofertas** para el prestador, se realizan ajustes y se implementa la vista de **Admin** con su usuario correspondiente.
   
   **TomAlig** - 30/10/2026 - Se sube la versión terminada 1 del README, para la evaluación parcial 2.
+
+  **TomAlig** - 17/11/2026 - Se implementan los cableados Xano de "Ofertas" y "Solicitudes", y se adapta a la utilización previa de Room.
+
+  **pipl3n** - 20/11/2026 - Se realizan tres pruebas unitarias respecto al detalle de las ofertas.
+
+  **ignmartinezt, TomAlig** 22/11/2026 - Se implementa el ultimo cableado de Xano de "Usuario", y se corrigen detalles de "Ofertas".
+
+  **ignmartinezt** 22/11/2026 - Se implementa el recurso nativo de GPS para los prestadores en "Solicitudes Cerca".
+
+  **TomAlig** - 22/11/2026 - Se sube la versión final del README, para la evaluación parcial 3.
