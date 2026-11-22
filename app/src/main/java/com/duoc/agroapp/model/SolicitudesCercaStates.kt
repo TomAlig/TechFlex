@@ -15,5 +15,10 @@ data class SolicitudCercana(
 data class SolicitudesCercaEstadoUI(
     val solicitudes: List<SolicitudCercana> = emptyList(),
     //Empieza en true porque al abrir la pantalla todavía no llegan los datos.
-    val cargando: Boolean = true
+    val cargando: Boolean = true,
+    //Ubicacion del prestador, es null mientras no se lea el gps
+    val latitud: Double? = null,
+    val longitud: Double? = null,
+    //Mensaje si no dio permiso o no se pudo leer la ubicacion
+    val errorUbicacion: String? = null
 )

@@ -3,13 +3,15 @@ package com.duoc.agroapp.data.local
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SolicitudDao {
     //Guarda una nueva solicitud en el disco del celular.
-    @Insert
+    //El onconflict nuevo es para que si los datos son iguales se reemplacen.
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun guardarSolicitud(solicitud: SolicitudEntity)
 
     //Solo las solicitudes del usuario indicado, las más nuevas primero. Se actualiza sola al cambiar la tabla.
@@ -32,4 +34,8 @@ interface SolicitudDao {
     suspend fun actualizarEstado(id: Int, estado: String)
     @Delete
     suspend fun eliminarSolicitud(solicitud: SolicitudEntity)
+
+    //Nueva funcion para traer la lista bajada de Xano.
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun guardarTodasLasSolicitudes(solicitudes: List<SolicitudEntity>)
 }

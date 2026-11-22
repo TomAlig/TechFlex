@@ -29,6 +29,19 @@ class SolicitudesCercaViewModel(
                 estadoUI = estadoUI.copy(solicitudes = cercanas, cargando = false)
             }
         }
+        //Despues de revisar room (local), trae lo de xano (nube).
+        viewModelScope.launch {
+            repository.sincronizarConXano()
+        }
+    }
+    //Se llama cuando el gps entrega la ubicacion del prestador
+    fun onUbicacionObtenida(latitud: Double, longitud: Double) {
+        estadoUI = estadoUI.copy(latitud = latitud, longitud = longitud, errorUbicacion = null)
+    }
+
+    //Se llama si no dio permiso o no se pudo leer el gps
+    fun onErrorUbicacion(mensaje: String) {
+        estadoUI = estadoUI.copy(errorUbicacion = mensaje)
     }
 
     //Pasa de la fila de la tabla (SolicitudEntity) a lo que muestra la tarjeta (SolicitudCercana).

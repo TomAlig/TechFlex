@@ -20,6 +20,12 @@ class OfertasViewModel(
     var estadoUI by mutableStateOf(OfertasEstadoUI())
         private set
 
+    init {
+        viewModelScope.launch {
+            repository.sincronizarConXano()
+        }
+    }
+
     //Escucha de la solicitud actual; se cancela al abrir otra solicitud.
     private var trabajoOfertas: Job? = null
 

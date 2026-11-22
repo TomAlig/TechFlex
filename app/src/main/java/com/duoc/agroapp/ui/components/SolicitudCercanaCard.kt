@@ -33,7 +33,8 @@ fun SolicitudCercanaCard(
     numero: Int,
     solicitud: SolicitudCercana,
     onVerDetalle: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    mostrarDistancia: Boolean = true
 ) {
     //Si la superficie es entera (10.0) se muestra "10".
     val superficieTexto = if (solicitud.superficieHa % 1.0 == 0.0) {
@@ -64,7 +65,13 @@ fun SolicitudCercanaCard(
                     fontSize = 18.sp,
                     modifier = Modifier.weight(1f)   //ocupa el espacio libre y empuja la distancia a la derecha
                 )
-                Etiqueta("A ${solicitud.distanciaKm} km", fondo = AzulClaro, colorTexto = AzulTechFlex)
+                if (mostrarDistancia) {
+                    Etiqueta(
+                        "A ${solicitud.distanciaKm} km",
+                        fondo = AzulClaro,
+                        colorTexto = AzulTechFlex
+                    )
+                }
             }
             Spacer(Modifier.height(6.dp))
 

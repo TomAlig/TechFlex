@@ -2,13 +2,14 @@ package com.duoc.agroapp.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface OfertaDao {
     //Guarda una oferta nueva hecha por un prestador.
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun guardarOferta(oferta: OfertaEntity)
 
     //Busca si este prestador ya ofertó en esta solicitud, para no dejarlo ofertar dos veces.
@@ -27,4 +28,8 @@ interface OfertaDao {
     //Marca como rechazadas las demás ofertas de la misma solicitud.
     @Query("UPDATE ofertas_tabla SET estado = 'Rechazada' WHERE solicitudId = :solicitudId AND id != :ofertaId")
     suspend fun rechazarLasDemas(solicitudId: Int, ofertaId: Int)
+
+    // Nueva función para meter la lista de ofertas que baja de Xano
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun guardarTodasLasOfertas(ofertas: List<OfertaEntity>)
 }
