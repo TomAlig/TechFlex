@@ -4,6 +4,7 @@ import com.duoc.agroapp.data.local.UserDao
 import com.duoc.agroapp.data.local.UserEntity
 import com.duoc.agroapp.model.TIPO_ADMIN
 import kotlinx.coroutines.flow.Flow
+import com.duoc.agroapp.data.remote.RetrofitClient
 
 //Une la vista del administrador con la tabla de usuarios.
 class AdminRepository(private val userDao: UserDao) {
@@ -14,13 +15,26 @@ class AdminRepository(private val userDao: UserDao) {
         const val CONTRASENA_ADMIN = "admin1234"
     }
 
+    //Baja los usuarios de xano y los guarda en room sin perder la sesion recordada
+    suspend fun sincronizarConXano() {
+        val emailSesion = userDao.buscarEmailSesion()
+        val usuariosXano = RetrofitClient.usuarioApi.obtenerUsuarios()
+        userDao.guardarTodosLosUsuarios(
+            usuariosXano.map { it.copy(esUltimoLogeado = it.email == emailSesion) }
+        )
+    }
+    //Borra al usuario en xano y despues en room
+    suspend fun eliminarUsuario(usuario: UserEntity) {
+        //Si el id es 0 el usuario solo existe en este telefono, asi que no se llama a xano
+        if (usuario.id != 0) {
+            RetrofitClient.usuarioApi.eliminarUsuario(usuario.id)
+        }
+        userDao.eliminarUsuario(usuario)
+    }
+
     //Lista de usuarios (sin el admin), se actualiza sola al eliminar.
     fun obtenerUsuarios(): Flow<List<UserEntity>> {
         return userDao.obtenerUsuariosParaAdmin()
-    }
-
-    suspend fun eliminarUsuario(usuario: UserEntity) {
-        userDao.eliminarUsuario(usuario)
     }
 
     //Crea la cuenta admin solo si todavía no existe. Se llama cada vez que se abre la app.
