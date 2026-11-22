@@ -12,21 +12,21 @@ import retrofit2.http.Path
 interface UsuarioApiService {
 
     //Trae todos los usuarios
-    @GET("usuarios")
+    @GET("usuario")
     suspend fun obtenerUsuarios(): List<UserEntity>
 
     //Crea un usuario nuevo y xano lo devuelve con su id
-    @POST("usuarios")
+    @POST("usuario")
     suspend fun crearUsuario(@Body usuario: UserEntity): UserEntity
 
     //Edita un usuario usando el id de xano
-    @PATCH("usuarios/{usuarios_id}")
+    @PATCH("usuario/{usuario_id}")
     suspend fun actualizarUsuario(
-        @Path("usuarios_id") id: Int,
+        @Path("usuario_id") id: Int,
         @Body usuario: UserEntity
     ): UserEntity
 
     //Borra un usuario usando el id de xano
-    @DELETE("usuarios/{usuarios_id}")
-    suspend fun eliminarUsuario(@Path("usuarios_id") id: Int)
+    @DELETE("usuario/{usuario_id}")
+    suspend fun eliminarUsuario(@Path("usuario_id") id: Int)
 }

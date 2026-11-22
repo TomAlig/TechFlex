@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,9 +62,6 @@ class MainActivity : ComponentActivity() {
         val viewModel = LoginViewModel(repository)
         val solicitudRepository = SolicitudRepository(database.solicitudDao())
 
-        //Correo temporal: cuando el login pase el usuario, se reemplaza por el real.
-        val crearSolicitudViewModel = CrearSolicitudViewModel(solicitudRepository, "productor@demo.cl")
-        val misSolicitudesViewModel = MisSolicitudesViewModel(solicitudRepository, "productor@demo.cl")
         val solicitudesCercaViewModel = SolicitudesCercaViewModel(solicitudRepository)
         val registroRepository = RegistroRepository(dao)
         val registroViewModel = RegistroViewModel(registroRepository)
@@ -173,6 +171,10 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("mis_solicitudes") {
+                            //Lectura de correo al iniciar la vista, no al iniciar la app.
+                            val misSolicitudesViewModel = remember(PerfilViewModel.emailUsuarioLogueado) {
+                                MisSolicitudesViewModel(solicitudRepository, PerfilViewModel.emailUsuarioLogueado)
+                            }
                             MisSolicitudesScreen(
                                 viewModel = misSolicitudesViewModel,
                                 onNuevaSolicitud = { navController.navigate("crear_solicitud") },
@@ -191,6 +193,10 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("crear_solicitud") {
+                            //Lectura de correo al iniciar la vista, no al iniciar la app.
+                            val crearSolicitudViewModel = remember(PerfilViewModel.emailUsuarioLogueado) {
+                                CrearSolicitudViewModel(solicitudRepository, PerfilViewModel.emailUsuarioLogueado)
+                            }
                             CrearSolicitudScreen(
                                 viewModel = crearSolicitudViewModel,
                                 onSolicitudCreada = { navController.popBackStack() },

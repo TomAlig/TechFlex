@@ -8,7 +8,7 @@ object RetrofitClient {
     private const val BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:ZaIqlMn1/"
 
     //Url de mi xano de prueba para usuarios, cuando funcione se cambia por la del proyecto
-    private const val BASE_URL_USUARIOS = "https://x8ki-letl-twmt.n7.xano.io/api:sAio0x6h/"
+    //private const val BASE_URL_USUARIOS = "https://x8ki-letl-twmt.n7.xano.io/api:sAio0x6h/"
 
     //Se conecta a la base de xano, y construye apiservice por separado para las peticiones.
     private val retrofit: Retrofit by lazy {
@@ -19,15 +19,10 @@ object RetrofitClient {
     }
 
     //Retrofit aparte solo para usuarios mientras pruebo en mi xano
-    private val retrofitUsuarios: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL_USUARIOS)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+
 
     val usuarioApi: UsuarioApiService by lazy {
-        retrofitUsuarios.create(UsuarioApiService::class.java)
+        retrofit.create(UsuarioApiService::class.java)
     }
 
     val solicitudApi: SolicitudApiService by lazy {
