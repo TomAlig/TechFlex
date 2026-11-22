@@ -111,6 +111,7 @@ fun SolicitudesCercaScreen(
                         SolicitudCercanaCard(
                             numero = indice + 1,
                             solicitud = solicitud,
+                            mostrarDistancia = (latitud != null && longitud != null),
                             onVerDetalle = { onVerDetalle(solicitud.id) }
                         )
                     }
