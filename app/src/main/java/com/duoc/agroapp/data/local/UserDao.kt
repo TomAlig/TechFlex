@@ -58,4 +58,12 @@ interface UserDao {
     //Elimina un usuario de la tabla.
     @Delete
     suspend fun eliminarUsuario(usuario: UserEntity)
+
+    //Guarda la lista que baja de xano, si el usuario ya existe lo reemplaza
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun guardarTodosLosUsuarios(usuarios: List<UserEntity>)
+
+    //Correo del usuario que tiene la sesion recordada, o null si no hay nadie
+    @Query("SELECT email FROM usuarios_tabla WHERE esUltimoLogeado = 1 LIMIT 1")
+    suspend fun buscarEmailSesion(): String?
 }

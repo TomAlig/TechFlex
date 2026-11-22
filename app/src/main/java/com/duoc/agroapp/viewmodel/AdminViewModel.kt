@@ -25,6 +25,14 @@ class AdminViewModel(
                 estadoUI = estadoUI.copy(usuarios = lista, cargando = false)
             }
         }
+        //Despues de escuchar room, trae los usuarios de xano
+        viewModelScope.launch {
+            try {
+                repository.sincronizarConXano()
+            } catch (e: Exception) {
+                //Sin internet se muestra lo que ya esta guardado en room
+            }
+        }
     }
 
     //Primer toque: guarda a quién se quiere eliminar y abre el modal.
@@ -37,10 +45,15 @@ class AdminViewModel(
     }
 
     //Segundo toque (en el modal): elimina de verdad y cierra el modal.
+    //Segundo toque en el modal, elimina de verdad y cierra el modal
     fun onConfirmarEliminar() {
         val usuario = estadoUI.usuarioAEliminar ?: return
         viewModelScope.launch {
-            repository.eliminarUsuario(usuario)
+            try {
+                repository.eliminarUsuario(usuario)
+            } catch (e: Exception) {
+                //Si xano falla no se borra nada y el usuario sigue en la lista
+            }
             estadoUI = estadoUI.copy(usuarioAEliminar = null)
         }
     }
