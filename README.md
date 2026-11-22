@@ -74,8 +74,8 @@ De esta manera, por más que no haya conexión a internet, el usuario podrá ver
 
   **pipl3n** - 20/11/2026 - Se realizan tres pruebas unitarias respecto al detalle de las ofertas.
 
-  **ignmartinezt, TomAlig** 22/11/2026 - Se implementa el ultimo cableado de Xano de "Usuario", y se corrigen detalles de "Ofertas".
+  **ignmartinezt, TomAlig** - 22/11/2026 - Se implementa el ultimo cableado de Xano de "Usuario", y se corrigen detalles de "Ofertas".
 
-  **ignmartinezt** 22/11/2026 - Se implementa el recurso nativo de GPS para los prestadores en "Solicitudes Cerca".
+  **ignmartinezt** - 22/11/2026 - Se implementa el recurso nativo de GPS para los prestadores en "Solicitudes Cerca".
 
   **TomAlig** - 22/11/2026 - Se sube la versión final del README, para la evaluación parcial 3.
